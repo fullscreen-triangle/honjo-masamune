@@ -7,8 +7,8 @@ COMMENT = _{ "//" ~ (!"\n" ~ ANY)* ~ "\n" | "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
 
 // Basic tokens
 identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
-variable = @{ ASCII_UPPER ~ (ASCII_ALPHANUMERIC | "_")* }
-atom = @{ ASCII_LOWER ~ (ASCII_ALPHANUMERIC | "_")* }
+variable = @{ 'A'..'Z' ~ (ASCII_ALPHANUMERIC | "_")* }
+atom = @{ 'a'..'z' ~ (ASCII_ALPHANUMERIC | "_")* }
 string = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
 number = @{ "-"? ~ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
 truth_value = @{ "0." ~ ASCII_DIGIT+ | "1.0" | "0.0" }

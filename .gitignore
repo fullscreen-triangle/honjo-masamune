@@ -211,7 +211,9 @@ k8s-secrets/
 *confidential*
 
 # Honjo Masamune ceremonial artifacts (NEVER COMMIT)
+# Note: Excludes assets/honjo-masamune.png (project logo)
 *masamune*
+!assets/honjo-masamune.png
 *ceremonial*
 *sword*
 *truth_engine*

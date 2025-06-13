@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc};
 use fuzzy_logic_core::FuzzyTruth;
 use parking_lot::{Mutex, RwLock};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+
 use std::sync::Arc;
 use tokio::sync::broadcast;
 use uuid::Uuid;

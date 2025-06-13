@@ -2,7 +2,7 @@
 <p align="center"><em>So sharp, single use renders it corrupted</em></p>
 
 <div align="center">
-  <img src="assets/honjo-masamune.png" alt="Honjo Masamune Logo" width="400">
+  <img src="assets/honjo-masamune.png" alt="Honjo Masamune Logo" width="300" height="300">
 </div>
 
 [![Rust](https://img.shields.io/badge/Rust-%23000000.svg?e&logo=rust&logoColor=white)](#)
