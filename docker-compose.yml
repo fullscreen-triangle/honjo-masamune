@@ -1,0 +1,235 @@
+version: '3.8'
+
+services:
+  # Core Honjo Masamune Engine
+  honjo-masamune:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: honjo-masamune-engine
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=info
+      - DATABASE_URL=postgresql://honjo:ceremonial_sword@postgres:5432/honjo_masamune
+      - NEO4J_URL=bolt://neo4j:7687
+      - CLICKHOUSE_URL=http://clickhouse:8123
+      - REDIS_URL=redis://redis:6379
+      - ATP_INITIAL_POOL=1000000
+      - CEREMONIAL_MODE=false
+    ports:
+      - "8080:8080"  # Main API
+      - "8081:8081"  # Buhera script engine
+      - "8082:8082"  # Truth synthesis endpoint
+    volumes:
+      - ./config:/app/config:ro
+      - ./data/corpus:/app/data/corpus:ro
+      - ./logs:/app/logs
+      - honjo_atp_state:/app/atp_state
+    depends_on:
+      - postgres
+      - neo4j
+      - clickhouse
+      - redis
+    networks:
+      - honjo-network
+
+  # PostgreSQL - Structured data and system state
+  postgres:
+    image: postgres:16-alpine
+    container_name: honjo-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=honjo_masamune
+      - POSTGRES_USER=honjo
+      - POSTGRES_PASSWORD=ceremonial_sword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - honjo-network
+
+  # Neo4j - Knowledge graphs and relationship mapping
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: honjo-neo4j
+    restart: unless-stopped
+    environment:
+      - NEO4J_AUTH=neo4j/truth_synthesis
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+      - NEO4J_dbms_memory_heap_initial__size=2G
+      - NEO4J_dbms_memory_heap_max__size=8G
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - ./neo4j/plugins:/plugins:ro
+    networks:
+      - honjo-network
+
+  # ClickHouse - Analytics and time-series data
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.12-alpine
+    container_name: honjo-clickhouse
+    restart: unless-stopped
+    environment:
+      - CLICKHOUSE_DB=honjo_analytics
+      - CLICKHOUSE_USER=honjo
+      - CLICKHOUSE_PASSWORD=truth_analytics
+    ports:
+      - "8123:8123"  # HTTP
+      - "9000:9000"  # Native
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml:ro
+    networks:
+      - honjo-network
+
+  # Redis - Caching and session management
+  redis:
+    image: redis:7.2-alpine
+    container_name: honjo-redis
+    restart: unless-stopped
+    command: redis-server --requirepass truth_cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - honjo-network
+
+  # Prometheus - Metrics collection
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: honjo-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - honjo-network
+
+  # Grafana - Monitoring dashboards
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: honjo-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=honjo
+      - GF_SECURITY_ADMIN_PASSWORD=masamune_insights
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - honjo-network
+
+  # Jaeger - Distributed tracing
+  jaeger:
+    image: jaegertracing/all-in-one:1.51
+    container_name: honjo-jaeger
+    restart: unless-stopped
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"  # UI
+      - "14268:14268"  # HTTP collector
+    volumes:
+      - jaeger_data:/badger
+    networks:
+      - honjo-network
+
+  # Repository Interface Gateway
+  repository-gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    container_name: honjo-repository-gateway
+    restart: unless-stopped
+    environment:
+      - GATEWAY_PORT=8090
+      - REPOSITORY_CONFIG=/app/config/repositories.yml
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./config/repositories.yml:/app/config/repositories.yml:ro
+    networks:
+      - honjo-network
+
+  # Preparation Engine (separate service for long-running preparation)
+  preparation-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile.preparation
+    container_name: honjo-preparation-engine
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=info
+      - DATABASE_URL=postgresql://honjo:ceremonial_sword@postgres:5432/honjo_masamune
+      - CORPUS_PATH=/app/data/corpus
+      - PREPARATION_WORKERS=8
+    volumes:
+      - ./data/corpus:/app/data/corpus:ro
+      - ./data/models:/app/data/models
+      - preparation_state:/app/preparation_state
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - honjo-network
+
+  # Dreaming Module (runs during rest periods)
+  dreaming-module:
+    build:
+      context: .
+      dockerfile: Dockerfile.dreaming
+    container_name: honjo-dreaming-module
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=debug
+      - DREAM_CYCLE_INTERVAL=3600  # 1 hour
+      - LACTATE_PROCESSING_ENABLED=true
+    volumes:
+      - ./data/dreams:/app/data/dreams
+      - dreaming_state:/app/dreaming_state
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - honjo-network
+
+volumes:
+  postgres_data:
+  neo4j_data:
+  neo4j_logs:
+  clickhouse_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  jaeger_data:
+  honjo_atp_state:
+  preparation_state:
+  dreaming_state:
+
+networks:
+  honjo-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16 

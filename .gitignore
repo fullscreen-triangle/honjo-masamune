@@ -1,0 +1,234 @@
+# Honjo Masamune Truth Engine .gitignore
+
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.out
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Docker
+.dockerignore
+
+# Honjo Masamune specific
+# ATP state files
+atp_state/
+*.atp
+
+# Information corpus (sensitive data)
+data/corpus/
+data/models/
+data/dreams/
+
+# Preparation artifacts
+preparation_state/
+dreaming_state/
+
+# Ceremonial mode artifacts (HIGHLY SENSITIVE)
+ceremonial/
+*.ceremonial
+*.sword
+
+# Truth synthesis outputs
+truth_outputs/
+synthesis_results/
+*.truth
+
+# Buhera compiled scripts
+*.buhera.compiled
+buhera_cache/
+
+# Configuration overrides
+config/local.yml
+config/production.yml
+config/ceremonial.yml
+config/*.secret.yml
+
+# Certificates and keys
+certs/
+*.pem
+*.key
+*.crt
+*.p12
+
+# Monitoring data
+prometheus_data/
+grafana_data/
+jaeger_data/
+
+# Backup files
+*.backup
+*.bak
+backups/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+dist/
+build/
+
+# Documentation build
+docs/book/
+target/doc/
+
+# Test artifacts
+test_results/
+coverage/
+
+# Fuzzy logic training data
+fuzzy_training/
+*.fuzzy
+
+# Repository interface cache
+repository_cache/
+*.repo_cache
+
+# Gray area analysis
+gray_areas/
+*.gray
+
+# Lactate processing files
+lactate/
+*.lactate
+
+# Dream cycle outputs
+dreams/
+*.dream
+
+# Elite organization verification
+elite_verification/
+*.elite
+
+# Financial verification
+financial_verification/
+*.financial
+
+# Moral authority verification
+moral_authority/
+*.authority
+
+# Truth spectrum analysis
+truth_spectrum/
+*.spectrum
+
+# Confidence interval data
+confidence_intervals/
+*.confidence
+
+# Uncertainty source tracking
+uncertainty_sources/
+*.uncertainty
+
+# Biomimetic processing artifacts
+biomimetic/
+*.bio
+
+# Metacognitive state
+metacognitive_state/
+*.meta
+
+# Repository orchestration logs
+orchestration_logs/
+*.orchestration
+
+# Synthesis pipeline artifacts
+synthesis_pipeline/
+*.synthesis
+
+# Verification artifacts
+verification/
+*.verification
+
+# Emergency shutdown artifacts
+emergency/
+*.emergency
+
+# Performance benchmarks
+benchmarks/
+*.bench
+
+# Security audit results
+audit_results/
+*.audit
+
+# Release artifacts
+releases/
+*.tar.gz
+*.zip
+
+# Local development overrides
+local/
+dev_overrides/
+
+# Kubernetes secrets
+k8s-secrets/
+*.k8s.secret
+
+# Terraform state (if used for infrastructure)
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Ansible vault files (if used for configuration)
+*.vault
+
+# Any file containing "secret" or "private"
+*secret*
+*private*
+*confidential*
+
+# Honjo Masamune ceremonial artifacts (NEVER COMMIT)
+*masamune*
+*ceremonial*
+*sword*
+*truth_engine*
+
+# Repository-specific ignores
+gospel_cache/
+homo_veloce_cache/
+moriarty_cache/
+sighthound_cache/
+hegel_cache/
+combine_harvester_cache/
+four_sided_triangle_cache/
+izinyoka_cache/
+trebuchet_cache/
+heihachi_cache/
+kwasa_kwasa_cache/
+pakati_cache/
+helicopter_cache/
+purpose_cache/
+vibrio_cache/

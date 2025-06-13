@@ -1,0 +1,125 @@
+[package]
+name = "honjo-masamune"
+version = "0.1.0"
+edition = "2021"
+authors = ["fullscreen-triangle"]
+description = "The Ultimate Truth Engine - Biomimetic metacognitive truth synthesis system"
+license = "RESTRICTED"
+repository = "https://github.com/fullscreen-triangle/honjo-masamune"
+keywords = ["truth-engine", "fuzzy-logic", "metacognition", "biomimetic", "intelligence"]
+categories = ["science", "algorithms", "simulation"]
+
+[workspace]
+members = [
+    "crates/buhera-engine",
+    "crates/truth-respiration",
+    "crates/fuzzy-logic",
+    "crates/repository-interfaces",
+    "crates/dreaming-module",
+    "crates/preparation-engine",
+    "crates/atp-manager",
+    "crates/metacognitive-stack"
+]
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+
+# Fuzzy logic and mathematics
+fuzzy-logic = "0.2"
+nalgebra = "0.32"
+ndarray = "0.15"
+statrs = "0.16"
+
+# Serialization and configuration
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# Database connections
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "chrono", "uuid"] }
+neo4rs = "0.7"
+clickhouse = "0.11"
+
+# HTTP client for repository communication
+reqwest = { version = "0.11", features = ["json", "stream"] }
+hyper = { version = "0.14", features = ["full"] }
+
+# Logging and monitoring
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+metrics = "0.21"
+metrics-exporter-prometheus = "0.12"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Cryptography and security
+ring = "0.17"
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Configuration management
+config = "0.13"
+clap = { version = "4.4", features = ["derive"] }
+
+# Memory management and performance
+rayon = "1.8"
+crossbeam = "0.8"
+parking_lot = "0.12"
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Workspace crates
+buhera-engine = { path = "crates/buhera-engine" }
+truth-respiration = { path = "crates/truth-respiration" }
+fuzzy-logic-core = { path = "crates/fuzzy-logic" }
+repository-interfaces = { path = "crates/repository-interfaces" }
+dreaming-module = { path = "crates/dreaming-module" }
+preparation-engine = { path = "crates/preparation-engine" }
+atp-manager = { path = "crates/atp-manager" }
+metacognitive-stack = { path = "crates/metacognitive-stack" }
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.4"
+mockall = "0.11"
+
+[[bin]]
+name = "honjo-masamune"
+path = "src/main.rs"
+
+[[bin]]
+name = "buhera-cli"
+path = "src/bin/buhera_cli.rs"
+
+[[bin]]
+name = "preparation-manager"
+path = "src/bin/preparation_manager.rs"
+
+[[bin]]
+name = "truth-synthesizer"
+path = "src/bin/truth_synthesizer.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true
+overflow-checks = true
+
+[features]
+default = ["full"]
+full = ["fuzzy-logic", "dreaming", "preparation", "repository-orchestration"]
+fuzzy-logic = []
+dreaming = []
+preparation = []
+repository-orchestration = []
+ceremonial-mode = []  # For production deployments only 
