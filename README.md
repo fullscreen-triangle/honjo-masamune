@@ -2,13 +2,14 @@
 <p align="center"><em>So sharp, single use renders is corrupted</em></p>
 
 <p align="center">
-  <img src="honjo-masamune.png" alt="Logo">
+  <img src="assets/honjo-masamune.png" alt="Logo">
 </p>
 
 [![Rust](https://img.shields.io/badge/Rust-%23000000.svg?e&logo=rust&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
 
