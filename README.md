@@ -1,9 +1,9 @@
 <h1 align="center">Honjo Masamune</h1>
-<p align="center"><em>So sharp, single use renders is corrupted</em></p>
+<p align="center"><em>So sharp, single use renders it corrupted</em></p>
 
-<p align="center">
-  <img src="assets/honjo-masamune.png" alt="Logo">
-</p>
+<div align="center">
+  <img src="assets/honjo-masamune.png" alt="Honjo Masamune Logo" width="400">
+</div>
 
 [![Rust](https://img.shields.io/badge/Rust-%23000000.svg?e&logo=rust&logoColor=white)](#)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)

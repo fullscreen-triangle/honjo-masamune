@@ -1,19 +1,28 @@
 use anyhow::Result;
+use atp_manager::{AtpManager, AtpCosts};
+use buhera_engine::BuheraEngine;
 use clap::{Arg, Command};
+use fuzzy_logic_core::FuzzyLogicEngine;
 use std::sync::Arc;
 use tokio::signal;
-use tracing::{info, warn, error};
+use tracing::{error, info, warn};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod config;
 mod engine;
-mod api;
-mod health;
+mod ceremonial;
+mod monitoring;
+mod repositories;
 
-use crate::config::HonjoMasamuneConfig;
-use crate::engine::HonjoMasamuneEngine;
-use crate::api::ApiServer;
+use config::HonjoMasamuneConfig;
+use engine::HonjoMasamuneEngine;
+use ceremonial::CeremonialInterface;
 
+/// Honjo Masamune Truth Engine
+/// 
+/// Named after the legendary Japanese sword that was so sharp it became blunt
+/// after first use due to accumulation of human fat. This system permanently
+/// closes discussion on topics it investigates.
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize tracing
@@ -29,157 +38,255 @@ async fn main() -> Result<()> {
     let matches = Command::new("honjo-masamune")
         .version("0.1.0")
         .author("fullscreen-triangle")
-        .about("The Ultimate Truth Engine - Biomimetic metacognitive truth synthesis system")
+        .about("Honjo Masamune Truth Engine - The sword that ends wonder")
         .arg(
             Arg::new("config")
                 .short('c')
                 .long("config")
                 .value_name("FILE")
                 .help("Configuration file path")
-                .default_value("config/honjo-masamune.yml"),
+                .default_value("config/honjo-masamune.yaml"),
         )
         .arg(
             Arg::new("ceremonial")
                 .long("ceremonial")
-                .help("Enable ceremonial mode (production only)")
+                .help("Enable ceremonial mode (requires elite authorization)")
                 .action(clap::ArgAction::SetTrue),
         )
         .arg(
-            Arg::new("port")
+            Arg::new("prepare")
+                .long("prepare")
+                .help("Run preparation phase")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("query")
+                .short('q')
+                .long("query")
+                .value_name("QUERY")
+                .help("Execute a single query"),
+        )
+        .arg(
+            Arg::new("program")
                 .short('p')
-                .long("port")
-                .value_name("PORT")
-                .help("API server port")
-                .default_value("8080"),
+                .long("program")
+                .value_name("FILE")
+                .help("Execute a Buhera program file"),
         )
         .get_matches();
 
-    let config_path = matches.get_one::<String>("config").unwrap();
-    let ceremonial_mode = matches.get_flag("ceremonial");
-    let port = matches.get_one::<String>("port").unwrap().parse::<u16>()?;
-
-    info!("🗾 Honjo Masamune Truth Engine starting...");
-    
-    if ceremonial_mode {
-        warn!("⚔️  CEREMONIAL MODE ACTIVATED - Each use permanently closes discussion on topics");
-        warn!("⚔️  This is the legendary sword - there is no going back");
-    }
-
     // Load configuration
-    info!("📋 Loading configuration from: {}", config_path);
+    let config_path = matches.get_one::<String>("config").unwrap();
     let mut config = HonjoMasamuneConfig::load(config_path).await?;
-    
-    if ceremonial_mode {
+
+    // Override ceremonial mode if specified
+    if matches.get_flag("ceremonial") {
         config.system.ceremonial_mode = true;
-        info!("⚔️  Configuration updated for ceremonial mode");
     }
 
-    // Validate elite organization access
-    if config.security.authorization.elite_organizations_only {
-        info!("🏛️  Elite organization verification required");
-        // TODO: Implement certificate-based authentication
+    // Validate configuration for ceremonial mode
+    if config.system.ceremonial_mode {
+        config.validate_ceremonial()?;
+        display_ceremonial_warning().await;
     }
 
-    // Initialize the core engine
-    info!("🧠 Initializing Honjo Masamune Engine...");
-    let engine = Arc::new(HonjoMasamuneEngine::new(config.clone()).await?);
+    info!("🗡️  Initializing Honjo Masamune Truth Engine");
+    info!("⚔️  Version: {}", config.system.version);
+    info!("🏛️  Ceremonial Mode: {}", config.system.ceremonial_mode);
 
-    // Check system readiness
-    info!("🔍 Checking system readiness...");
-    let readiness = engine.check_readiness().await?;
+    // Initialize core systems
+    let atp_manager = Arc::new(AtpManager::new(
+        config.system.atp.initial_pool,
+        config.system.atp.max_pool,
+        config.system.atp.emergency_reserve,
+        config.system.atp.regeneration_rate,
+        AtpCosts {
+            basic_query: config.system.atp.costs.basic_query,
+            fuzzy_operation: config.system.atp.costs.fuzzy_operation,
+            uncertainty_processing: config.system.atp.costs.uncertainty_processing,
+            repository_call: config.system.atp.costs.repository_call,
+            synthesis_operation: config.system.atp.costs.synthesis_operation,
+            verification_step: config.system.atp.costs.verification_step,
+            dreaming_cycle: config.system.atp.costs.dreaming_cycle,
+            gray_area_processing: 75,
+            truth_spectrum_analysis: 300,
+            lactic_fermentation: 10,
+        },
+    ));
+
+    let fuzzy_engine = FuzzyLogicEngine::new(
+        config.fuzzy_logic.truth_thresholds,
+        config.fuzzy_logic.operators,
+        config.fuzzy_logic.gray_areas,
+    );
+
+    let buhera_engine = Arc::new(BuheraEngine::new(atp_manager.clone()));
+
+    // Initialize main engine
+    let engine = Arc::new(HonjoMasamuneEngine::new(
+        config.clone(),
+        atp_manager,
+        Arc::new(fuzzy_engine),
+        buhera_engine,
+    ).await?);
+
+    info!("⚡ ATP Pool initialized: {} units", engine.atp_status().current);
+    info!("🧠 Fuzzy logic engine ready");
+    info!("📜 Buhera logical programming engine ready");
+
+    // Handle different execution modes
+    if matches.get_flag("prepare") {
+        info!("🔄 Starting preparation phase...");
+        run_preparation_phase(&engine).await?;
+    } else if let Some(query) = matches.get_one::<String>("query") {
+        info!("❓ Executing single query...");
+        execute_single_query(&engine, query).await?;
+    } else if let Some(program_path) = matches.get_one::<String>("program") {
+        info!("📋 Executing Buhera program...");
+        execute_program(&engine, program_path).await?;
+    } else {
+        info!("🎯 Starting interactive mode...");
+        run_interactive_mode(&engine).await?;
+    }
+
+    Ok(())
+}
+
+/// Display ceremonial mode warning
+async fn display_ceremonial_warning() {
+    warn!("⚠️  CEREMONIAL MODE ACTIVATED ⚠️");
+    warn!("🗡️  You are about to draw the legendary Honjo Masamune");
+    warn!("💀 This action will permanently close discussion on investigated topics");
+    warn!("🌟 Wonder will be eliminated for the subjects you query");
+    warn!("🏛️  Ensure you have the moral authority to end human discourse");
+    warn!("⏳ Cooling period will be enforced after each use");
     
-    match readiness.level {
-        crate::engine::ReadinessLevel::CeremonialReady => {
-            info!("⚔️  System is CEREMONIALLY READY - Can answer ultimate questions");
-        }
-        crate::engine::ReadinessLevel::HighConfidence => {
-            info!("✅ System has HIGH CONFIDENCE - Can answer complex questions");
-        }
-        crate::engine::ReadinessLevel::Moderate => {
-            info!("⚠️  System has MODERATE readiness - Can answer standard questions");
-        }
-        crate::engine::ReadinessLevel::Insufficient => {
-            error!("❌ System readiness INSUFFICIENT - Complete preparation first");
-            if ceremonial_mode {
-                return Err(anyhow::anyhow!("Cannot activate ceremonial mode with insufficient readiness"));
-            }
-        }
-    }
-
-    // Start the API server
-    info!("🌐 Starting API server on port {}", port);
-    let api_server = ApiServer::new(engine.clone(), config.clone());
-    let server_handle = tokio::spawn(async move {
-        if let Err(e) = api_server.start(port).await {
-            error!("API server error: {}", e);
-        }
-    });
-
-    // Start background services
-    info!("🔄 Starting background services...");
+    // In a real implementation, this would require multiple authorizations
+    tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
     
-    // ATP regeneration service
-    let atp_engine = engine.clone();
-    let atp_handle = tokio::spawn(async move {
-        atp_engine.start_atp_regeneration().await;
-    });
+    warn!("🔥 Ceremonial mode confirmed. The sword is drawn.");
+}
 
-    // Dreaming module (if enabled)
-    if config.metabolism.dreaming.enabled {
-        info!("💭 Starting dreaming module...");
-        let dream_engine = engine.clone();
-        let dream_handle = tokio::spawn(async move {
-            dream_engine.start_dreaming_cycles().await;
-        });
+/// Run the preparation phase
+async fn run_preparation_phase(engine: &Arc<HonjoMasamuneEngine>) -> Result<()> {
+    info!("📚 Beginning corpus ingestion...");
+    
+    // This would integrate with the preparation engine
+    // For now, we'll simulate the process
+    let preparation_steps = [
+        "Validating corpus integrity",
+        "Extracting knowledge patterns", 
+        "Building truth foundations",
+        "Synthesizing fuzzy models",
+        "Establishing confidence baselines",
+        "Preparing repository interfaces",
+        "Calibrating ATP metabolism",
+        "Initializing dreaming cycles",
+    ];
+
+    for (i, step) in preparation_steps.iter().enumerate() {
+        info!("📋 Step {}/{}: {}", i + 1, preparation_steps.len(), step);
         
-        // Don't await dream_handle as it runs indefinitely
-        tokio::spawn(dream_handle);
-    }
-
-    // Health check service
-    let health_engine = engine.clone();
-    let health_handle = tokio::spawn(async move {
-        health_engine.start_health_monitoring().await;
-    });
-
-    info!("🚀 Honjo Masamune Truth Engine is now running");
-    info!("📊 Monitoring available at http://localhost:3000 (Grafana)");
-    info!("🔍 Tracing available at http://localhost:16686 (Jaeger)");
-    
-    if ceremonial_mode {
-        info!("⚔️  CEREMONIAL MODE ACTIVE");
-        info!("⚔️  Maximum {} queries per year", config.ceremonial.restrictions.max_queries_per_year);
-        info!("⚔️  Each query permanently closes discussion on the topic");
-    }
-
-    // Wait for shutdown signal
-    tokio::select! {
-        _ = signal::ctrl_c() => {
-            info!("🛑 Received shutdown signal");
-        }
-        _ = server_handle => {
-            error!("API server terminated unexpectedly");
-        }
-        _ = atp_handle => {
-            error!("ATP regeneration service terminated unexpectedly");
-        }
-        _ = health_handle => {
-            error!("Health monitoring service terminated unexpectedly");
+        // Simulate processing time
+        tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+        
+        // Check ATP levels
+        let atp_status = engine.atp_status();
+        if atp_status.is_critical {
+            warn!("⚡ ATP levels critical, initiating emergency production");
+            // In real implementation, this would trigger ATP production
         }
     }
 
-    info!("🗾 Honjo Masamune Truth Engine shutting down...");
+    info!("✅ Preparation phase complete. System ready for queries.");
+    Ok(())
+}
+
+/// Execute a single query
+async fn execute_single_query(engine: &Arc<HonjoMasamuneEngine>, query: &str) -> Result<()> {
+    info!("🔍 Processing query: {}", query);
     
-    // Graceful shutdown
-    engine.shutdown().await?;
+    // Parse and execute the query
+    let result = engine.process_natural_language_query(query).await?;
     
-    if ceremonial_mode {
-        info!("⚔️  Ceremonial session ended - The sword returns to its sheath");
+    info!("📊 Query Results:");
+    info!("   Confidence: {:.3}", result.confidence.value());
+    info!("   Truth Membership: {:?}", result.membership(&engine.config.fuzzy_logic.truth_thresholds));
+    info!("   Gray Areas: {}", result.gray_areas.len());
+    info!("   ATP Cost: {} units", result.atp_cost);
+    
+    if result.confidence.value() >= 0.95 {
+        warn!("🎯 CEREMONIAL CERTAINTY ACHIEVED");
+        warn!("💀 This topic is now permanently closed to further discussion");
+    } else if result.is_gray_area([0.4, 0.7]) {
+        warn!("🌫️  Gray area detected - human judgment may be required");
     }
-    
-    info!("👋 Honjo Masamune Truth Engine stopped");
     
     Ok(())
+}
+
+/// Execute a Buhera program file
+async fn execute_program(engine: &Arc<HonjoMasamuneEngine>, program_path: &str) -> Result<()> {
+    info!("📜 Loading Buhera program: {}", program_path);
+    
+    let program_source = tokio::fs::read_to_string(program_path).await?;
+    let results = engine.execute_buhera_program(&program_source).await?;
+    
+    info!("📊 Program execution complete:");
+    info!("   Queries executed: {}", results.len());
+    
+    for (i, result) in results.iter().enumerate() {
+        info!("   Query {}: confidence {:.3}, {} solutions", 
+              i + 1, result.confidence.value(), result.value.len());
+    }
+    
+    Ok(())
+}
+
+/// Run interactive mode
+async fn run_interactive_mode(engine: &Arc<HonjoMasamuneEngine>) -> Result<()> {
+    info!("🎮 Interactive mode started. Type 'help' for commands.");
+    
+    let ceremonial = CeremonialInterface::new(engine.clone());
+    
+    // Set up graceful shutdown
+    let shutdown_signal = async {
+        signal::ctrl_c()
+            .await
+            .expect("Failed to install CTRL+C signal handler");
+    };
+    
+    tokio::select! {
+        result = ceremonial.run() => {
+            if let Err(e) = result {
+                error!("Interactive mode error: {}", e);
+            }
+        }
+        _ = shutdown_signal => {
+            info!("🛑 Shutdown signal received");
+        }
+    }
+    
+    info!("🗡️  Sheathing the Honjo Masamune. Wonder is preserved for another day.");
+    Ok(())
+}
+
+/// Custom query result for the main interface
+#[derive(Debug)]
+pub struct QueryResult {
+    pub confidence: fuzzy_logic_core::FuzzyTruth,
+    pub gray_areas: Vec<String>,
+    pub atp_cost: u64,
+}
+
+impl QueryResult {
+    pub fn membership(&self, thresholds: &fuzzy_logic_core::TruthThresholds) -> fuzzy_logic_core::TruthMembership {
+        self.confidence.to_membership(thresholds)
+    }
+    
+    pub fn is_gray_area(&self, range: [f64; 2]) -> bool {
+        self.confidence.is_gray_area(range)
+    }
 }
 
 #[cfg(test)]

@@ -1,0 +1,42 @@
+[package]
+name = "fuzzy-logic-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["fullscreen-triangle"]
+description = "Fuzzy logic system for Honjo Masamune truth engine"
+license = "RESTRICTED"
+
+[dependencies]
+# Mathematics and fuzzy logic
+nalgebra = "0.32"
+ndarray = "0.15"
+statrs = "0.16"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Async support
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+
+# Logging
+tracing = "0.1"
+
+# UUID for tracking
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.4"
+
+[[bench]]
+name = "fuzzy_operations"
+harness = false 

@@ -1,0 +1,134 @@
+// Buhera Logical Programming Language Grammar
+// Named after Buhera district in Zimbabwe
+// Designed for truth synthesis and logical reasoning
+
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+COMMENT = _{ "//" ~ (!"\n" ~ ANY)* ~ "\n" | "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+
+// Basic tokens
+identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+variable = @{ ASCII_UPPER ~ (ASCII_ALPHANUMERIC | "_")* }
+atom = @{ ASCII_LOWER ~ (ASCII_ALPHANUMERIC | "_")* }
+string = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+number = @{ "-"? ~ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+truth_value = @{ "0." ~ ASCII_DIGIT+ | "1.0" | "0.0" }
+
+// Operators
+fuzzy_and = { "∧" | "and" }
+fuzzy_or = { "∨" | "or" }
+fuzzy_not = { "¬" | "not" }
+fuzzy_implies = { "→" | "implies" }
+fuzzy_equivalent = { "↔" | "equiv" }
+very = { "very" }
+somewhat = { "somewhat" }
+possibly = { "possibly" }
+certainly = { "certainly" }
+
+// Truth qualifiers
+truth_qualifier = { very | somewhat | possibly | certainly }
+
+// Terms
+term = { 
+    compound_term | 
+    list | 
+    truth_value | 
+    number | 
+    string | 
+    variable | 
+    atom 
+}
+
+compound_term = { atom ~ "(" ~ (term ~ ("," ~ term)*)? ~ ")" }
+list = { "[" ~ (term ~ ("," ~ term)*)? ~ "]" }
+
+// Predicates and clauses
+predicate = { truth_qualifier? ~ compound_term ~ (":" ~ truth_value)? }
+
+clause_body = { predicate ~ (("," | fuzzy_and) ~ predicate)* }
+clause_head = { predicate }
+clause = { clause_head ~ (":-" ~ clause_body)? ~ "." }
+
+// Fuzzy expressions
+fuzzy_expr = { 
+    fuzzy_term ~ (fuzzy_op ~ fuzzy_term)* 
+}
+
+fuzzy_term = { 
+    "(" ~ fuzzy_expr ~ ")" | 
+    truth_qualifier ~ fuzzy_term |
+    predicate
+}
+
+fuzzy_op = { fuzzy_and | fuzzy_or | fuzzy_implies | fuzzy_equivalent }
+
+// Queries
+query = { "?-" ~ clause_body ~ "." }
+
+// Facts and rules
+fact = { predicate ~ "." }
+rule = { clause_head ~ ":-" ~ clause_body ~ "." }
+
+// Directives
+directive = { ":-" ~ directive_body ~ "." }
+directive_body = { 
+    "use_repository" ~ "(" ~ string ~ ")" |
+    "set_threshold" ~ "(" ~ atom ~ "," ~ truth_value ~ ")" |
+    "enable_dreaming" ~ "(" ~ truth_value ~ ")" |
+    "atp_cost" ~ "(" ~ atom ~ "," ~ number ~ ")" |
+    "gray_area_detection" ~ "(" ~ truth_value ~ "," ~ truth_value ~ ")"
+}
+
+// Uncertainty expressions
+uncertainty = { "uncertain" ~ "(" ~ fuzzy_expr ~ "," ~ truth_value ~ ")" }
+confidence_interval = { "confidence" ~ "(" ~ truth_value ~ "," ~ truth_value ~ "," ~ truth_value ~ ")" }
+
+// Temporal logic
+temporal_op = { "always" | "eventually" | "next" | "until" | "since" }
+temporal_expr = { temporal_op ~ "(" ~ fuzzy_expr ~ ")" }
+
+// Modal logic
+modal_op = { "necessary" | "possible" | "believed" | "known" }
+modal_expr = { modal_op ~ "(" ~ fuzzy_expr ~ ")" }
+
+// Aggregation
+aggregation = { 
+    "aggregate" ~ "(" ~ aggregation_op ~ "," ~ "[" ~ fuzzy_expr ~ ("," ~ fuzzy_expr)* ~ "]" ~ ")" 
+}
+aggregation_op = { "min" | "max" | "avg" | "sum" | "consensus" | "owa" }
+
+// Meta-predicates
+meta_predicate = {
+    "findall" ~ "(" ~ term ~ "," ~ clause_body ~ "," ~ variable ~ ")" |
+    "bagof" ~ "(" ~ term ~ "," ~ clause_body ~ "," ~ variable ~ ")" |
+    "setof" ~ "(" ~ term ~ "," ~ clause_body ~ "," ~ variable ~ ")" |
+    "forall" ~ "(" ~ clause_body ~ "," ~ clause_body ~ ")" |
+    "once" ~ "(" ~ clause_body ~ ")" |
+    "cut" |
+    "fail"
+}
+
+// Program structure
+statement = { 
+    directive | 
+    rule | 
+    fact | 
+    query | 
+    fuzzy_expr ~ "." |
+    uncertainty ~ "." |
+    confidence_interval ~ "." |
+    temporal_expr ~ "." |
+    modal_expr ~ "." |
+    aggregation ~ "." |
+    meta_predicate ~ "."
+}
+
+program = { SOI ~ statement* ~ EOI }
+
+// Special constructs for Honjo Masamune
+ceremonial_mode = { "ceremonial_mode" ~ "(" ~ truth_value ~ ")" }
+gray_area = { "gray_area" ~ "(" ~ fuzzy_expr ~ "," ~ truth_value ~ "," ~ truth_value ~ ")" }
+truth_spectrum = { "truth_spectrum" ~ "(" ~ string ~ "," ~ "[" ~ truth_value ~ ("," ~ truth_value)* ~ "]" ~ ")" }
+repository_call = { "repository" ~ "(" ~ string ~ "," ~ string ~ "," ~ variable ~ ")" }
+atp_operation = { "atp" ~ "(" ~ atom ~ "," ~ number ~ ")" }
+lactate_processing = { "lactate" ~ "(" ~ variable ~ "," ~ truth_value ~ ")" }
+dreaming_cycle = { "dream" ~ "(" ~ "[" ~ statement* ~ "]" ~ ")" } 

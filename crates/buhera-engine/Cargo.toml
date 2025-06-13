@@ -1,0 +1,61 @@
+[package]
+name = "buhera-engine"
+version = "0.1.0"
+edition = "2021"
+authors = ["fullscreen-triangle"]
+description = "Buhera logical programming engine for Honjo Masamune truth synthesis"
+license = "RESTRICTED"
+
+[dependencies]
+# Parsing and AST
+nom = "7.1"
+pest = "2.7"
+pest_derive = "2.7"
+
+# Async support
+tokio = { version = "1.35", features = ["full"] }
+async-trait = "0.1"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+tracing = "0.1"
+
+# UUID for tracking
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# Time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Collections and data structures
+indexmap = "2.1"
+petgraph = "0.6"
+
+# Pattern matching
+regex = "1.10"
+
+# Concurrency
+parking_lot = "0.12"
+dashmap = "5.5"
+
+# Integration with other crates
+fuzzy-logic-core = { path = "../fuzzy-logic" }
+atp-manager = { path = "../atp-manager" }
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1.4"
+
+[build-dependencies]
+pest_generator = "2.7"
+
+[[bench]]
+name = "buhera_execution"
+harness = false 
