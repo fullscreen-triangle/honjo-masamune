@@ -42,6 +42,4 @@ fuzzy-logic-core = { path = "../fuzzy-logic" }
 criterion = "0.5"
 tokio-test = "0.4"
 
-[[bench]]
-name = "atp_operations"
-harness = false 
+ 

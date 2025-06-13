@@ -10,6 +10,7 @@ pub struct MetabolismStatus {
     pub lactate_level: u64,
 }
 
+#[derive(Debug)]
 pub struct MetabolismEngine;
 
 impl MetabolismEngine {

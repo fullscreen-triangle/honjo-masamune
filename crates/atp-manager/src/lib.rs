@@ -268,6 +268,9 @@ impl AtpManager {
 
     /// Consume reserved ATP
     pub async fn consume_atp(&self, reservation: AtpReservation, operation: &str) -> Result<()> {
+        let reservation_id = reservation.id;
+        let amount = reservation.amount;
+        
         let mut pool = self.pool.write();
         pool.consume(reservation)?;
 
@@ -275,7 +278,7 @@ impl AtpManager {
         let transaction = AtpTransaction {
             id: Uuid::new_v4(),
             operation_type: operation.to_string(),
-            amount: reservation.amount,
+            amount,
             transaction_type: TransactionType::Consumption,
             confidence_impact: None,
             timestamp: Utc::now(),
@@ -286,8 +289,8 @@ impl AtpManager {
         // Send event
         let _ = self.event_sender.send(AtpEvent::Consumed {
             operation: operation.to_string(),
-            amount: reservation.amount,
-            reservation_id: reservation.id,
+            amount,
+            reservation_id,
         });
 
         Ok(())
@@ -295,6 +298,9 @@ impl AtpManager {
 
     /// Release reserved ATP without consuming
     pub async fn release_atp(&self, reservation: AtpReservation, operation: &str) {
+        let reservation_id = reservation.id;
+        let amount = reservation.amount;
+        
         let mut pool = self.pool.write();
         pool.release(reservation);
 
@@ -302,7 +308,7 @@ impl AtpManager {
         let transaction = AtpTransaction {
             id: Uuid::new_v4(),
             operation_type: operation.to_string(),
-            amount: reservation.amount,
+            amount,
             transaction_type: TransactionType::Release,
             confidence_impact: None,
             timestamp: Utc::now(),
@@ -313,14 +319,14 @@ impl AtpManager {
         // Send event
         let _ = self.event_sender.send(AtpEvent::Released {
             operation: operation.to_string(),
-            amount: reservation.amount,
-            reservation_id: reservation.id,
+            amount,
+            reservation_id,
         });
     }
 
     /// Produce ATP through cellular respiration
     pub async fn produce_atp(&self, glucose_units: u64) -> Result<u64> {
-        let mut metabolism = self.metabolism.lock();
+        let metabolism = self.metabolism.lock();
         let produced = metabolism.cellular_respiration(glucose_units).await?;
 
         let mut pool = self.pool.write();
@@ -349,7 +355,7 @@ impl AtpManager {
 
     /// Handle incomplete processing through lactic fermentation
     pub async fn lactic_fermentation(&self, incomplete_data: u64) -> Result<(u64, u64)> {
-        let mut metabolism = self.metabolism.lock();
+        let metabolism = self.metabolism.lock();
         let (atp_produced, lactate_produced) = metabolism.lactic_fermentation(incomplete_data).await?;
 
         let mut pool = self.pool.write();

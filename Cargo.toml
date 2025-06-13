@@ -26,8 +26,7 @@ members = [
 tokio = { version = "1.35", features = ["full"] }
 async-trait = "0.1"
 
-# Fuzzy logic and mathematics
-fuzzy-logic = "0.2"
+# Mathematics
 nalgebra = "0.32"
 ndarray = "0.15"
 statrs = "0.16"
