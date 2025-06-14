@@ -20,6 +20,8 @@ pub struct HonjoMasamuneConfig {
     pub mzekezeke: MzekezekeBayesianConfig,
     pub diggiden: DiggidenConfig,
     pub hatata: HatataConfig,
+    pub spectacular: SpectacularConfig,
+    pub nicotine: NicotineConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -698,6 +700,92 @@ pub struct StateSpaceConfig {
     pub state_bounds: Vec<(f64, f64)>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpectacularConfig {
+    /// Detection criteria for extraordinary findings
+    pub detection: SpectacularDetectionConfig,
+    
+    /// Processing strategies configuration
+    pub processing: SpectacularProcessingConfig,
+    
+    /// ATP costs for spectacular processing
+    pub atp_costs: SpectacularAtpCosts,
+    
+    /// Spectacular finding indicators
+    pub indicators: HashMap<String, SpectacularIndicatorConfig>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpectacularDetectionConfig {
+    pub confidence_threshold: f64,
+    pub significance_threshold: f64,
+    pub min_indicators: usize,
+    pub enable_amplification: bool,
+    pub resonance_detection: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpectacularProcessingConfig {
+    pub paradigm_shift_multiplier: f64,
+    pub anomaly_amplification_factor: f64,
+    pub contextual_elevation_boost: f64,
+    pub resonance_enhancement: f64,
+    pub emergent_pattern_recognition: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpectacularAtpCosts {
+    pub base_spectacular_processing: u64,
+    pub per_indicator_cost: u64,
+    pub complexity_multiplier_threshold: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SpectacularIndicatorConfig {
+    pub weight: f64,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NicotineConfig {
+    /// Enable nicotine breaks
+    pub enabled: bool,
+    
+    /// Break criteria configuration
+    pub break_criteria: NicotineBreakCriteria,
+    
+    /// Puzzle generation settings
+    pub puzzle_settings: PuzzleSettings,
+    
+    /// ATP costs for nicotine processing
+    pub atp_costs: NicotineAtpCosts,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NicotineBreakCriteria {
+    pub operations_trigger: u32,
+    pub time_trigger_minutes: i64,
+    pub complexity_trigger: f64,
+    pub drift_threshold: f64,
+    pub enable_adaptive_timing: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PuzzleSettings {
+    pub min_complexity: f64,
+    pub max_complexity: f64,
+    pub puzzle_types_enabled: Vec<String>,
+    pub validation_strictness: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NicotineAtpCosts {
+    pub base_break_cost: u64,
+    pub complexity_multiplier: f64,
+    pub puzzle_generation_cost: u64,
+    pub validation_cost: u64,
+}
+
 impl HonjoMasamuneConfig {
     /// Load configuration from a YAML file
     pub async fn load<P: AsRef<Path>>(path: P) -> Result<Self> {
@@ -1138,6 +1226,91 @@ impl Default for HonjoMasamuneConfig {
                     discretization_levels: 10,
                     continuous_space: true,
                     state_bounds: vec![(0.0, 1.0), (0.0, 1.0)],
+                },
+            },
+            spectacular: SpectacularConfig {
+                detection: SpectacularDetectionConfig {
+                    confidence_threshold: 0.85,
+                    significance_threshold: 0.7,
+                    min_indicators: 2,
+                    enable_amplification: true,
+                    resonance_detection: true,
+                },
+                processing: SpectacularProcessingConfig {
+                    paradigm_shift_multiplier: 2.5,
+                    anomaly_amplification_factor: 1.8,
+                    contextual_elevation_boost: 1.6,
+                    resonance_enhancement: 2.0,
+                    emergent_pattern_recognition: 1.9,
+                },
+                atp_costs: SpectacularAtpCosts {
+                    base_spectacular_processing: 500,
+                    per_indicator_cost: 100,
+                    complexity_multiplier_threshold: 4,
+                },
+                indicators: {
+                    let mut indicators = HashMap::new();
+                    indicators.insert("unexpected_certainty".to_string(), SpectacularIndicatorConfig {
+                        weight: 2.0,
+                        description: "High confidence in previously uncertain areas".to_string(),
+                    });
+                    indicators.insert("extreme_confidence".to_string(), SpectacularIndicatorConfig {
+                        weight: 2.5,
+                        description: "Near-absolute certainty (>98%)".to_string(),
+                    });
+                    indicators.insert("paradoxical_pattern".to_string(), SpectacularIndicatorConfig {
+                        weight: 2.2,
+                        description: "Simultaneous high and low confidence aspects".to_string(),
+                    });
+                    indicators.insert("paradigm_shift".to_string(), SpectacularIndicatorConfig {
+                        weight: 3.0,
+                        description: "Fundamental assumptions challenged".to_string(),
+                    });
+                    indicators.insert("novel_pattern".to_string(), SpectacularIndicatorConfig {
+                        weight: 1.5,
+                        description: "New patterns of understanding emerged".to_string(),
+                    });
+                    indicators.insert("cross_domain_resonance".to_string(), SpectacularIndicatorConfig {
+                        weight: 1.8,
+                        description: "Connections between separate domains".to_string(),
+                    });
+                    indicators.insert("recursive_implication".to_string(), SpectacularIndicatorConfig {
+                        weight: 1.9,
+                        description: "Self-referential emergent properties".to_string(),
+                    });
+                    indicators.insert("historical_significance".to_string(), SpectacularIndicatorConfig {
+                        weight: 2.8,
+                        description: "Lasting historical importance".to_string(),
+                    });
+                    indicators
+                },
+            },
+            nicotine: NicotineConfig {
+                enabled: true,
+                break_criteria: NicotineBreakCriteria {
+                    operations_trigger: 10,
+                    time_trigger_minutes: 15,
+                    complexity_trigger: 5.0,
+                    drift_threshold: 0.3,
+                    enable_adaptive_timing: true,
+                },
+                puzzle_settings: PuzzleSettings {
+                    min_complexity: 0.3,
+                    max_complexity: 0.9,
+                    puzzle_types_enabled: vec![
+                        "HashChain".to_string(),
+                        "StateEncoding".to_string(),
+                        "OperationSequence".to_string(),
+                        "ContextIntegrity".to_string(),
+                        "ObjectiveValidation".to_string(),
+                    ],
+                    validation_strictness: 0.8,
+                },
+                atp_costs: NicotineAtpCosts {
+                    base_break_cost: 200,
+                    complexity_multiplier: 50.0,
+                    puzzle_generation_cost: 100,
+                    validation_cost: 50,
                 },
             },
         }

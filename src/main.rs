@@ -13,6 +13,8 @@ mod engine;
 mod ceremonial;
 mod monitoring;
 mod repositories;
+mod spectacular;
+mod nicotine;
 
 use config::HonjoMasamuneConfig;
 use engine::HonjoMasamuneEngine;

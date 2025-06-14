@@ -16,6 +16,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::config::HonjoMasamuneConfig;
 use crate::QueryResult;
+use crate::spectacular::{SpectacularEngine, SpectacularCriteria};
+use crate::nicotine::{NicotineEngine, BreakCriteria, ProcessingContext, ProcessingOperation, ProcessingObjective};
 
 /// Main Honjo Masamune Truth Engine
 #[derive(Debug)]
@@ -24,6 +26,8 @@ pub struct HonjoMasamuneEngine {
     atp_manager: Arc<AtpManager>,
     fuzzy_engine: Arc<FuzzyLogicEngine>,
     buhera_engine: Arc<BuheraEngine>,
+    spectacular_engine: Arc<SpectacularEngine>,
+    nicotine_engine: Arc<NicotineEngine>,
     session_state: Arc<RwLock<SessionState>>,
     query_history: Arc<RwLock<Vec<QueryRecord>>>,
 }
@@ -39,11 +43,25 @@ impl HonjoMasamuneEngine {
         let session_state = Arc::new(RwLock::new(SessionState::new(config.system.ceremonial_mode)));
         let query_history = Arc::new(RwLock::new(Vec::new()));
 
+        // Initialize spectacular engine
+        let spectacular_engine = Arc::new(SpectacularEngine::new(
+            atp_manager.clone(),
+            SpectacularCriteria::default(),
+        ));
+
+        // Initialize nicotine engine
+        let nicotine_engine = Arc::new(NicotineEngine::new(
+            atp_manager.clone(),
+            BreakCriteria::default(),
+        ));
+
         let engine = Self {
             config,
             atp_manager,
             fuzzy_engine,
             buhera_engine,
+            spectacular_engine,
+            nicotine_engine,
             session_state,
             query_history,
         };
@@ -72,6 +90,39 @@ impl HonjoMasamuneEngine {
 
         let reservation = self.atp_manager.reserve_atp("natural_language_query", total_cost).await?;
 
+        // Track operation for nicotine break system
+        let operation = ProcessingOperation {
+            operation_type: "natural_language_query".to_string(),
+            complexity_contribution: complexity_cost as f64 / 1000.0,
+            confidence_impact: 0.1,
+            drift_impact: 0.02,
+        };
+        self.nicotine_engine.track_operation(&operation).await?;
+
+        // Check if nicotine break is needed
+        if self.nicotine_engine.should_take_break().await? {
+            info!("🚬 Nicotine break triggered during query processing");
+            let current_context = ProcessingContext {
+                primary_objective: ProcessingObjective {
+                    description: format!("Process query: {}", query),
+                    priority: 0.8,
+                    success_criteria: vec!["Return accurate result".to_string()],
+                },
+                active_queries: vec![query.to_string()],
+                pending_operations: vec![],
+                processing_depth: 1,
+                complexity_level: complexity_cost as f64 / 1000.0,
+                confidence_level: 0.5,
+            };
+            
+            let break_result = self.nicotine_engine.take_nicotine_break(&current_context).await?;
+            if break_result.solution_correct {
+                info!("✅ Context validated and refreshed during break");
+            } else {
+                warn!("⚠️ Context validation failed - proceeding with caution");
+            }
+        }
+
         // Convert natural language to Buhera program
         let buhera_program = self.natural_language_to_buhera(query).await?;
 
@@ -85,12 +136,23 @@ impl HonjoMasamuneEngine {
         let result = self.synthesize_query_result(
             query,
             execution_results,
-            truth_spectrum,
+            truth_spectrum.clone(),
             total_cost,
         ).await?;
 
         // Consume ATP
         self.atp_manager.consume_atp(reservation, "natural_language_query").await?;
+
+        // Check for spectacular implications
+        if let Some(spectacular_finding) = self.spectacular_engine.analyze_for_spectacular_implications(
+            query,
+            &result,
+            &truth_spectrum,
+        ).await? {
+            warn!("🌟 Spectacular finding detected and processed!");
+            warn!("🎯 Significance: {:.4}", spectacular_finding.significance_score);
+            warn!("🔍 Implications: {:?}", spectacular_finding.implications);
+        }
 
         // Record query in history
         self.record_query(query, &result).await;
@@ -140,6 +202,39 @@ impl HonjoMasamuneEngine {
             ceremonial_mode: state.ceremonial_mode,
             topics_closed: state.topics_closed.len(),
         }
+    }
+
+    /// Get all spectacular findings
+    pub async fn get_spectacular_findings(&self) -> Vec<crate::spectacular::SpectacularFinding> {
+        self.spectacular_engine.get_spectacular_findings().await
+    }
+
+    /// Get top spectacular findings by significance
+    pub async fn get_top_spectacular_findings(&self, limit: usize) -> Vec<crate::spectacular::SpectacularFinding> {
+        self.spectacular_engine.get_top_spectacular_findings(limit).await
+    }
+
+    /// Get nicotine break statistics
+    pub async fn get_nicotine_break_statistics(&self) -> crate::nicotine::BreakStatistics {
+        self.nicotine_engine.get_break_statistics().await
+    }
+
+    /// Force a nicotine break for context validation
+    pub async fn force_nicotine_break(&self, query: &str) -> Result<crate::nicotine::NicotineBreakResult> {
+        let current_context = ProcessingContext {
+            primary_objective: ProcessingObjective {
+                description: format!("Forced break for query: {}", query),
+                priority: 0.7,
+                success_criteria: vec!["Validate context".to_string()],
+            },
+            active_queries: vec![query.to_string()],
+            pending_operations: vec![],
+            processing_depth: 1,
+            complexity_level: 2.0,
+            confidence_level: 0.8,
+        };
+        
+        self.nicotine_engine.take_nicotine_break(&current_context).await
     }
 
     /// Initialize ceremonial mode restrictions
