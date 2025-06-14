@@ -15,6 +15,10 @@ mod monitoring;
 mod repositories;
 mod spectacular;
 mod nicotine;
+mod mzekezeke;
+mod diggiden;
+mod hatata;
+mod zengeza;
 
 use config::HonjoMasamuneConfig;
 use engine::HonjoMasamuneEngine;

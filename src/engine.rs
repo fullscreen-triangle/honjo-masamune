@@ -18,6 +18,10 @@ use crate::config::HonjoMasamuneConfig;
 use crate::QueryResult;
 use crate::spectacular::{SpectacularEngine, SpectacularCriteria};
 use crate::nicotine::{NicotineEngine, BreakCriteria, ProcessingContext, ProcessingOperation, ProcessingObjective};
+use crate::mzekezeke::{MzekezekeEngine, Evidence, Hypothesis};
+use crate::diggiden::{DiggidenEngine, AttackCampaignConfig, AttackIntensity};
+use crate::hatata::{HatataEngine, ActionOption, ActionType, ResourceRequirements};
+use crate::zengeza::{ZengezaEngine, CommunicationContext, NoiseAnalysisResult, DenoisedStatement, NoiseStatistics};
 
 /// Main Honjo Masamune Truth Engine
 #[derive(Debug)]
@@ -28,6 +32,10 @@ pub struct HonjoMasamuneEngine {
     buhera_engine: Arc<BuheraEngine>,
     spectacular_engine: Arc<SpectacularEngine>,
     nicotine_engine: Arc<NicotineEngine>,
+    mzekezeke_engine: Arc<MzekezekeEngine>,
+    diggiden_engine: Arc<DiggidenEngine>,
+    hatata_engine: Arc<HatataEngine>,
+    zengeza_engine: Arc<ZengezaEngine>,
     session_state: Arc<RwLock<SessionState>>,
     query_history: Arc<RwLock<Vec<QueryRecord>>>,
 }
@@ -55,6 +63,30 @@ impl HonjoMasamuneEngine {
             BreakCriteria::default(),
         ));
 
+        // Initialize mzekezeke engine
+        let mzekezeke_engine = Arc::new(MzekezekeEngine::new(
+            config.mzekezeke_bayesian.clone(),
+            atp_manager.clone(),
+        ));
+
+        // Initialize diggiden engine
+        let diggiden_engine = Arc::new(DiggidenEngine::new(
+            config.diggiden_adversarial.clone(),
+            atp_manager.clone(),
+        ));
+
+        // Initialize hatata engine
+        let hatata_engine = Arc::new(HatataEngine::new(
+            config.hatata_decision.clone(),
+            atp_manager.clone(),
+        ));
+
+        // Initialize zengeza engine
+        let zengeza_engine = Arc::new(ZengezaEngine::new(
+            config.zengeza_noise.clone(),
+            atp_manager.clone(),
+        ));
+
         let engine = Self {
             config,
             atp_manager,
@@ -62,6 +94,10 @@ impl HonjoMasamuneEngine {
             buhera_engine,
             spectacular_engine,
             nicotine_engine,
+            mzekezeke_engine,
+            diggiden_engine,
+            hatata_engine,
+            zengeza_engine,
             session_state,
             query_history,
         };
@@ -235,6 +271,61 @@ impl HonjoMasamuneEngine {
         };
         
         self.nicotine_engine.take_nicotine_break(&current_context).await
+    }
+
+    /// Get mzekezeke network statistics
+    pub async fn get_mzekezeke_statistics(&self) -> crate::mzekezeke::NetworkStatistics {
+        self.mzekezeke_engine.get_network_statistics().await
+    }
+
+    /// Add evidence to mzekezeke belief network
+    pub async fn add_evidence(&self, evidence: Vec<Evidence>) -> Result<crate::mzekezeke::BeliefUpdateResult> {
+        self.mzekezeke_engine.process_evidence_batch(evidence).await
+    }
+
+    /// Get diggiden vulnerability statistics
+    pub async fn get_vulnerability_statistics(&self) -> crate::diggiden::VulnerabilityStatistics {
+        self.diggiden_engine.get_vulnerability_statistics().await
+    }
+
+    /// Launch adversarial attack campaign
+    pub async fn launch_attack_campaign(&self, campaign_name: &str) -> Result<crate::diggiden::AttackCampaignResult> {
+        let campaign_config = AttackCampaignConfig {
+            name: campaign_name.to_string(),
+            max_rounds: 5,
+            intensity: AttackIntensity::Medium,
+            target_success_rate: 0.3,
+        };
+        
+        self.diggiden_engine.launch_attack_campaign(&self.mzekezeke_engine, campaign_config).await
+    }
+
+    /// Get hatata decision statistics
+    pub async fn get_decision_statistics(&self) -> crate::hatata::DecisionStatistics {
+        self.hatata_engine.get_decision_statistics().await
+    }
+
+    /// Optimize decisions with hatata engine
+    pub async fn optimize_decisions(&self, available_actions: Vec<ActionOption>) -> Result<crate::hatata::DecisionOptimizationResult> {
+        let belief_state = self.mzekezeke_engine.get_network_statistics().await;
+        let spectacular_findings = self.spectacular_engine.get_top_findings(5).await;
+        
+        self.hatata_engine.optimize_decisions(belief_state, spectacular_findings, available_actions).await
+    }
+
+    /// Get noise analysis statistics from zengeza engine
+    pub async fn get_noise_statistics(&self) -> NoiseStatistics {
+        self.zengeza_engine.get_noise_statistics().await
+    }
+
+    /// Analyze communication noise in a statement
+    pub async fn analyze_communication_noise(&self, statement: &str, context: CommunicationContext) -> Result<NoiseAnalysisResult> {
+        self.zengeza_engine.analyze_communication_noise(statement, context).await
+    }
+
+    /// Denoise a statement based on noise analysis
+    pub async fn denoise_statement(&self, statement: &str, noise_analysis: &NoiseAnalysisResult) -> Result<DenoisedStatement> {
+        self.zengeza_engine.denoise_statement(statement, noise_analysis).await
     }
 
     /// Initialize ceremonial mode restrictions

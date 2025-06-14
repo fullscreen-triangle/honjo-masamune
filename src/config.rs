@@ -17,9 +17,10 @@ pub struct HonjoMasamuneConfig {
     pub ceremonial: CeremonialConfig,
     pub development: DevelopmentConfig,
     pub bloodhound: BloodhoundConfig,
-    pub mzekezeke: MzekezekeBayesianConfig,
-    pub diggiden: DiggidenConfig,
-    pub hatata: HatataConfig,
+    pub mzekezeke_bayesian: MzekezekeBayesianConfig,
+    pub diggiden_adversarial: DiggidenAdversarialConfig,
+    pub hatata_decision: HatataDecisionConfig,
+    pub zengeza_noise: ZengezaNoiseConfig,
     pub spectacular: SpectacularConfig,
     pub nicotine: NicotineConfig,
 }
@@ -611,7 +612,7 @@ pub struct BatchProcessingConfig {
 
 /// Diggiden adversarial system configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DiggidenConfig {
+pub struct DiggidenAdversarialConfig {
     /// Enable adversarial testing
     pub enabled: bool,
     
@@ -627,8 +628,8 @@ pub struct DiggidenConfig {
     /// Enable adaptive attack strategies
     pub adaptive_strategies: bool,
     
-    /// Attack strategy weights
-    pub strategy_weights: HashMap<String, f64>,
+    /// Attack strategy priorities
+    pub strategy_priorities: HashMap<String, f64>,
     
     /// Enable continuous monitoring
     pub continuous_monitoring: bool,
@@ -639,50 +640,53 @@ pub struct DiggidenConfig {
 
 /// Hatata MDP processor configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HatataConfig {
+pub struct HatataDecisionConfig {
     /// Enable MDP processing
     pub enabled: bool,
     
-    /// Discount factor for future rewards
-    pub discount_factor: f64,
-    
-    /// Learning rate for value iteration
-    pub learning_rate: f64,
-    
-    /// Convergence threshold for value iteration
-    pub convergence_threshold: f64,
-    
-    /// Maximum iterations for algorithms
-    pub max_iterations: u32,
-    
-    /// Enable stochastic differential equations
-    pub enable_sde: bool,
-    
-    /// Time step for numerical integration
-    pub time_step: f64,
+    /// MDP configuration
+    pub mdp_config: MDPConfig,
     
     /// Utility function configuration
-    pub utility_functions: UtilityFunctionConfig,
+    pub utility_config: UtilityConfig,
     
     /// State space configuration
     pub state_space: StateSpaceConfig,
 }
 
-/// Utility function configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct UtilityFunctionConfig {
+pub struct MDPConfig {
+    /// Maximum iterations for algorithms
+    pub max_iterations: u32,
+    
+    /// Convergence threshold for value iteration
+    pub convergence_threshold: f64,
+    
+    /// Solution algorithm type
+    pub algorithm: SolutionAlgorithm,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum SolutionAlgorithm {
+    ValueIteration,
+    PolicyIteration,
+    QLearning,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UtilityConfig {
     /// Default utility function weights
     pub default_weights: HashMap<String, f64>,
     
     /// Enable adaptive utility learning
     pub adaptive_learning: bool,
     
-    /// Utility function types to use
-    pub enabled_types: Vec<String>,
-    
     /// Risk preference parameter
     pub risk_preference: f64,
 }
+
+/// Utility function configuration
+
 
 /// State space configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -698,6 +702,43 @@ pub struct StateSpaceConfig {
     
     /// State bounds
     pub state_bounds: Vec<(f64, f64)>,
+}
+
+/// Configuration for the Zengeza communication noise analysis module
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZengezaNoiseConfig {
+    /// Enable noise analysis
+    pub enabled: bool,
+    
+    /// Noise analyzer weights
+    pub hedging_weight: f64,
+    pub cultural_weight: f64,
+    pub emotional_weight: f64,
+    pub ambiguity_weight: f64,
+    pub assumption_weight: f64,
+    pub social_weight: f64,
+    pub rhetorical_weight: f64,
+    pub indirect_weight: f64,
+    
+    /// Analysis thresholds
+    pub noise_threshold: f64,
+    pub clarity_threshold: f64,
+    pub confidence_threshold: f64,
+    
+    /// Denoising settings
+    pub enable_denoising: bool,
+    pub max_denoising_iterations: u32,
+    pub denoising_confidence_threshold: f64,
+    
+    /// Cultural context settings
+    pub enable_cultural_context: bool,
+    pub default_cultural_background: String,
+    pub cultural_amplification_factor: f64,
+    
+    /// Processing settings
+    pub batch_processing: bool,
+    pub max_concurrent_analyses: u32,
+    pub analysis_timeout_seconds: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -1106,7 +1147,7 @@ impl Default for HonjoMasamuneConfig {
                     plain_language_explanations: true,
                 },
             },
-            mzekezeke: MzekezekeBayesianConfig {
+            mzekezeke_bayesian: MzekezekeBayesianConfig {
                 enabled: true,
                 temporal_decay: TemporalDecayConfig {
                     enabled: true,
@@ -1197,37 +1238,51 @@ impl Default for HonjoMasamuneConfig {
                     },
                 },
             },
-            diggiden: DiggidenConfig {
+            diggiden_adversarial: DiggidenAdversarialConfig {
                 enabled: true,
                 attack_frequency: 1.0,
                 max_attack_intensity: 1.0,
                 vulnerability_threshold: 0.5,
                 adaptive_strategies: true,
-                strategy_weights: HashMap::new(),
+                strategy_priorities: {
+                    let mut priorities = HashMap::new();
+                    priorities.insert("weak_evidence".to_string(), 1.0);
+                    priorities.insert("overconfidence".to_string(), 1.2);
+                    priorities.insert("circular_reasoning".to_string(), 1.1);
+                    priorities.insert("bias_amplification".to_string(), 0.9);
+                    priorities.insert("temporal_inconsistency".to_string(), 0.8);
+                    priorities.insert("evidence_collusion".to_string(), 1.3);
+                    priorities
+                },
                 continuous_monitoring: true,
                 default_stealth_level: 0.5,
             },
-            hatata: HatataConfig {
+            hatata_decision: HatataDecisionConfig {
                 enabled: true,
-                discount_factor: 0.9,
-                learning_rate: 0.1,
-                convergence_threshold: 0.01,
-                max_iterations: 1000,
-                enable_sde: true,
-                time_step: 0.01,
-                utility_functions: UtilityFunctionConfig {
-                    default_weights: HashMap::new(),
+                mdp_config: MDPConfig {
+                    max_iterations: 1000,
+                    convergence_threshold: 0.01,
+                    algorithm: SolutionAlgorithm::ValueIteration,
+                },
+                utility_config: UtilityConfig {
+                    default_weights: {
+                        let mut weights = HashMap::new();
+                        weights.insert("efficiency".to_string(), 0.3);
+                        weights.insert("reliability".to_string(), 0.4);
+                        weights.insert("innovation".to_string(), 0.3);
+                        weights
+                    },
                     adaptive_learning: true,
-                    enabled_types: vec!["linear".to_string()],
                     risk_preference: 0.5,
                 },
                 state_space: StateSpaceConfig {
-                    dimensions: 2,
+                    dimensions: 3,
                     discretization_levels: 10,
                     continuous_space: true,
-                    state_bounds: vec![(0.0, 1.0), (0.0, 1.0)],
+                    state_bounds: vec![(0.0, 1.0), (0.0, 1.0), (0.0, 1.0)],
                 },
             },
+            zengeza_noise: ZengezaNoiseConfig::default(),
             spectacular: SpectacularConfig {
                 detection: SpectacularDetectionConfig {
                     confidence_threshold: 0.85,
@@ -1315,4 +1370,229 @@ impl Default for HonjoMasamuneConfig {
             },
         }
     }
-} 
+}
+
+// Add Default implementations for new config types
+impl Default for MzekezekeBayesianConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            temporal_decay: TemporalDecayConfig::default(),
+            optimization: OptimizationConfig::default(),
+            python_runtime: PythonRuntimeConfig::default(),
+            network_structure: NetworkStructureConfig::default(),
+            evidence_processing: EvidenceProcessingConfig::default(),
+        }
+    }
+}
+
+impl Default for TemporalDecayConfig {
+    fn default() -> Self {
+        let mut decay_rates = HashMap::new();
+        decay_rates.insert("default".to_string(), 0.1);
+        
+        let mut decay_functions = HashMap::new();
+        decay_functions.insert("default".to_string(), "exponential".to_string());
+        
+        Self {
+            enabled: true,
+            default_decay_rates: decay_rates,
+            minimum_strength_threshold: 0.01,
+            refresh_interval_hours: 1,
+            adaptive_decay: true,
+            decay_functions,
+        }
+    }
+}
+
+impl Default for OptimizationConfig {
+    fn default() -> Self {
+        Self {
+            max_iterations: 1000,
+            convergence_tolerance: 1e-6,
+            algorithm: "variational_bayes".to_string(),
+            learning_rate: 0.01,
+            momentum: 0.9,
+            parallel_optimization: true,
+            optimization_workers: 4,
+        }
+    }
+}
+
+impl Default for PythonRuntimeConfig {
+    fn default() -> Self {
+        Self {
+            python_path: None,
+            venv_path: Some("./venv".to_string()),
+            python_paths: vec![],
+            memory_limit_mb: 8192,
+            enable_multiprocessing: true,
+            worker_processes: 4,
+            required_packages: vec![
+                "numpy>=1.24.0".to_string(),
+                "scipy>=1.10.0".to_string(),
+                "networkx>=3.0".to_string(),
+            ],
+        }
+    }
+}
+
+impl Default for NetworkStructureConfig {
+    fn default() -> Self {
+        Self {
+            max_nodes: 10000,
+            max_edges_per_node: 50,
+            auto_prune_edges: true,
+            edge_pruning_threshold: 0.1,
+            hierarchical_structure: false,
+            max_network_depth: 5,
+            target_density: 0.1,
+            dynamic_restructuring: true,
+        }
+    }
+}
+
+impl Default for EvidenceProcessingConfig {
+    fn default() -> Self {
+        let mut source_credibility = HashMap::new();
+        source_credibility.insert("ScientificPublication".to_string(), 0.9);
+        source_credibility.insert("ExperimentalData".to_string(), 0.95);
+        source_credibility.insert("ExpertOpinion".to_string(), 0.7);
+        
+        Self {
+            truth_dimension_weights: TruthDimensionWeights::default(),
+            source_credibility_multipliers: source_credibility,
+            minimum_quality_threshold: 0.3,
+            auto_validation: true,
+            batch_processing: BatchProcessingConfig::default(),
+        }
+    }
+}
+
+impl Default for TruthDimensionWeights {
+    fn default() -> Self {
+        Self {
+            factual_accuracy: 0.25,
+            contextual_relevance: 0.20,
+            temporal_validity: 0.15,
+            source_credibility: 0.20,
+            logical_consistency: 0.10,
+            empirical_support: 0.10,
+        }
+    }
+}
+
+impl Default for BatchProcessingConfig {
+    fn default() -> Self {
+        Self {
+            batch_size: 100,
+            timeout_seconds: 300,
+            parallel_batches: true,
+            max_concurrent_batches: 4,
+        }
+    }
+}
+
+impl Default for DiggidenAdversarialConfig {
+    fn default() -> Self {
+        let mut strategy_priorities = HashMap::new();
+        strategy_priorities.insert("weak_evidence".to_string(), 1.0);
+        strategy_priorities.insert("overconfidence".to_string(), 1.0);
+        strategy_priorities.insert("circular_reasoning".to_string(), 1.0);
+        
+        Self {
+            enabled: true,
+            attack_frequency: 0.5,
+            max_attack_intensity: 1.0,
+            vulnerability_threshold: 0.5,
+            adaptive_strategies: true,
+            strategy_priorities,
+            continuous_monitoring: false,
+            default_stealth_level: 0.5,
+        }
+    }
+}
+
+impl Default for HatataDecisionConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            mdp_config: MDPConfig::default(),
+            utility_config: UtilityConfig::default(),
+            state_space: StateSpaceConfig::default(),
+        }
+    }
+}
+
+impl Default for MDPConfig {
+    fn default() -> Self {
+        Self {
+            max_iterations: 1000,
+            convergence_threshold: 0.01,
+            algorithm: SolutionAlgorithm::ValueIteration,
+        }
+    }
+}
+
+impl Default for UtilityConfig {
+    fn default() -> Self {
+        let mut default_weights = HashMap::new();
+        default_weights.insert("efficiency".to_string(), 0.4);
+        default_weights.insert("reliability".to_string(), 0.6);
+        
+        Self {
+            default_weights,
+            adaptive_learning: false,
+            risk_preference: 0.5,
+        }
+    }
+}
+
+impl Default for StateSpaceConfig {
+    fn default() -> Self {
+        Self {
+            dimensions: 2,
+            discretization_levels: 10,
+            continuous_space: false,
+            state_bounds: vec![(0.0, 1.0), (0.0, 1.0)],
+        }
+    }
+}
+
+impl Default for ZengezaNoiseConfig {
+    fn default() -> Self {
+        Self {
+            enabled: true,
+            
+            // Noise analyzer weights
+            hedging_weight: 1.0,
+            cultural_weight: 0.8,
+            emotional_weight: 0.9,
+            ambiguity_weight: 1.1,
+            assumption_weight: 0.7,
+            social_weight: 0.5,
+            rhetorical_weight: 0.6,
+            indirect_weight: 0.8,
+            
+            // Analysis thresholds
+            noise_threshold: 0.3,
+            clarity_threshold: 0.7,
+            confidence_threshold: 0.6,
+            
+            // Denoising settings
+            enable_denoising: true,
+            max_denoising_iterations: 3,
+            denoising_confidence_threshold: 0.7,
+            
+            // Cultural context settings
+            enable_cultural_context: true,
+            default_cultural_background: "Western".to_string(),
+            cultural_amplification_factor: 1.2,
+            
+            // Processing settings
+            batch_processing: false,
+            max_concurrent_analyses: 4,
+            analysis_timeout_seconds: 30,
+        }
+    }
+}
