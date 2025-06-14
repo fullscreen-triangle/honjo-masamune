@@ -17,6 +17,9 @@ pub struct HonjoMasamuneConfig {
     pub ceremonial: CeremonialConfig,
     pub development: DevelopmentConfig,
     pub bloodhound: BloodhoundConfig,
+    pub mzekezeke: MzekezekeBayesianConfig,
+    pub diggiden: DiggidenConfig,
+    pub hatata: HatataConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -436,6 +439,265 @@ pub struct ConversationalAiConfig {
     pub plain_language_explanations: bool,
 }
 
+/// Mzekezeke Bayesian core configuration - the ML workhorse
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MzekezekeBayesianConfig {
+    /// Enable the mzekezeke ML workhorse
+    pub enabled: bool,
+    
+    /// Temporal decay configuration
+    pub temporal_decay: TemporalDecayConfig,
+    
+    /// Optimization algorithm settings
+    pub optimization: OptimizationConfig,
+    
+    /// Python runtime configuration
+    pub python_runtime: PythonRuntimeConfig,
+    
+    /// Network structure settings
+    pub network_structure: NetworkStructureConfig,
+    
+    /// Evidence processing settings
+    pub evidence_processing: EvidenceProcessingConfig,
+}
+
+/// Temporal decay configuration for evidence aging
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TemporalDecayConfig {
+    /// Enable temporal decay
+    pub enabled: bool,
+    
+    /// Default decay rates for different evidence types
+    pub default_decay_rates: HashMap<String, f64>,
+    
+    /// Minimum strength threshold before evidence is discarded
+    pub minimum_strength_threshold: f64,
+    
+    /// Refresh interval for updating decay states (in hours)
+    pub refresh_interval_hours: u64,
+    
+    /// Enable adaptive decay rates based on evidence performance
+    pub adaptive_decay: bool,
+    
+    /// Decay function types for different evidence
+    pub decay_functions: HashMap<String, String>,
+}
+
+/// Optimization algorithm configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OptimizationConfig {
+    /// Maximum iterations for network optimization
+    pub max_iterations: u64,
+    
+    /// Convergence tolerance
+    pub convergence_tolerance: f64,
+    
+    /// Optimization algorithm type
+    pub algorithm: String, // "variational_bayes", "mcmc", "em", "belief_propagation"
+    
+    /// Learning rate for gradient-based algorithms
+    pub learning_rate: f64,
+    
+    /// Momentum for gradient-based algorithms
+    pub momentum: f64,
+    
+    /// Enable parallel optimization
+    pub parallel_optimization: bool,
+    
+    /// Number of optimization workers
+    pub optimization_workers: u32,
+}
+
+/// Python runtime configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PythonRuntimeConfig {
+    /// Python executable path
+    pub python_path: Option<String>,
+    
+    /// Virtual environment path
+    pub venv_path: Option<String>,
+    
+    /// Additional Python paths
+    pub python_paths: Vec<String>,
+    
+    /// Memory limit for Python processes (in MB)
+    pub memory_limit_mb: u64,
+    
+    /// Enable Python multiprocessing
+    pub enable_multiprocessing: bool,
+    
+    /// Number of Python worker processes
+    pub worker_processes: u32,
+    
+    /// Python package requirements
+    pub required_packages: Vec<String>,
+}
+
+/// Network structure configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NetworkStructureConfig {
+    /// Maximum number of nodes in the belief network
+    pub max_nodes: u64,
+    
+    /// Maximum number of edges per node
+    pub max_edges_per_node: u32,
+    
+    /// Enable automatic edge pruning
+    pub auto_prune_edges: bool,
+    
+    /// Edge pruning threshold (minimum strength)
+    pub edge_pruning_threshold: f64,
+    
+    /// Enable hierarchical network structure
+    pub hierarchical_structure: bool,
+    
+    /// Maximum network depth for hierarchical structures
+    pub max_network_depth: u32,
+    
+    /// Network density target
+    pub target_density: f64,
+    
+    /// Enable dynamic network restructuring
+    pub dynamic_restructuring: bool,
+}
+
+/// Evidence processing configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EvidenceProcessingConfig {
+    /// Multi-dimensional truth assessment weights
+    pub truth_dimension_weights: TruthDimensionWeights,
+    
+    /// Evidence source credibility multipliers
+    pub source_credibility_multipliers: HashMap<String, f64>,
+    
+    /// Minimum evidence quality threshold
+    pub minimum_quality_threshold: f64,
+    
+    /// Enable automatic evidence validation
+    pub auto_validation: bool,
+    
+    /// Batch processing settings
+    pub batch_processing: BatchProcessingConfig,
+}
+
+/// Truth dimension weights for evidence assessment
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TruthDimensionWeights {
+    pub factual_accuracy: f64,
+    pub contextual_relevance: f64,
+    pub temporal_validity: f64,
+    pub source_credibility: f64,
+    pub logical_consistency: f64,
+    pub empirical_support: f64,
+}
+
+/// Batch processing configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BatchProcessingConfig {
+    /// Batch size for evidence processing
+    pub batch_size: u32,
+    
+    /// Processing timeout per batch (seconds)
+    pub timeout_seconds: u64,
+    
+    /// Enable parallel batch processing
+    pub parallel_batches: bool,
+    
+    /// Maximum concurrent batches
+    pub max_concurrent_batches: u32,
+}
+
+/// Diggiden adversarial system configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DiggidenConfig {
+    /// Enable adversarial testing
+    pub enabled: bool,
+    
+    /// Attack frequency (attacks per hour)
+    pub attack_frequency: f64,
+    
+    /// Maximum attack intensity
+    pub max_attack_intensity: f64,
+    
+    /// Vulnerability detection threshold
+    pub vulnerability_threshold: f64,
+    
+    /// Enable adaptive attack strategies
+    pub adaptive_strategies: bool,
+    
+    /// Attack strategy weights
+    pub strategy_weights: HashMap<String, f64>,
+    
+    /// Enable continuous monitoring
+    pub continuous_monitoring: bool,
+    
+    /// Attack stealth level
+    pub default_stealth_level: f64,
+}
+
+/// Hatata MDP processor configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HatataConfig {
+    /// Enable MDP processing
+    pub enabled: bool,
+    
+    /// Discount factor for future rewards
+    pub discount_factor: f64,
+    
+    /// Learning rate for value iteration
+    pub learning_rate: f64,
+    
+    /// Convergence threshold for value iteration
+    pub convergence_threshold: f64,
+    
+    /// Maximum iterations for algorithms
+    pub max_iterations: u32,
+    
+    /// Enable stochastic differential equations
+    pub enable_sde: bool,
+    
+    /// Time step for numerical integration
+    pub time_step: f64,
+    
+    /// Utility function configuration
+    pub utility_functions: UtilityFunctionConfig,
+    
+    /// State space configuration
+    pub state_space: StateSpaceConfig,
+}
+
+/// Utility function configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UtilityFunctionConfig {
+    /// Default utility function weights
+    pub default_weights: HashMap<String, f64>,
+    
+    /// Enable adaptive utility learning
+    pub adaptive_learning: bool,
+    
+    /// Utility function types to use
+    pub enabled_types: Vec<String>,
+    
+    /// Risk preference parameter
+    pub risk_preference: f64,
+}
+
+/// State space configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StateSpaceConfig {
+    /// Dimensionality of state space
+    pub dimensions: u32,
+    
+    /// State discretization levels
+    pub discretization_levels: u32,
+    
+    /// Enable continuous state space
+    pub continuous_space: bool,
+    
+    /// State bounds
+    pub state_bounds: Vec<(f64, f64)>,
+}
+
 impl HonjoMasamuneConfig {
     /// Load configuration from a YAML file
     pub async fn load<P: AsRef<Path>>(path: P) -> Result<Self> {
@@ -754,6 +1016,128 @@ impl Default for HonjoMasamuneConfig {
                     automatic_assumption_validation: true,
                     intelligent_test_selection: true,
                     plain_language_explanations: true,
+                },
+            },
+            mzekezeke: MzekezekeBayesianConfig {
+                enabled: true,
+                temporal_decay: TemporalDecayConfig {
+                    enabled: true,
+                    default_decay_rates: {
+                        let mut rates = HashMap::new();
+                        rates.insert("DirectObservation".to_string(), 0.05);
+                        rates.insert("IndirectInference".to_string(), 0.1);
+                        rates.insert("StatisticalCorrelation".to_string(), 0.15);
+                        rates.insert("ExpertOpinion".to_string(), 0.2);
+                        rates.insert("ExperimentalResult".to_string(), 0.08);
+                        rates.insert("TheoreticalPrediction".to_string(), 0.25);
+                        rates
+                    },
+                    minimum_strength_threshold: 0.01,
+                    refresh_interval_hours: 1,
+                    adaptive_decay: true,
+                    decay_functions: {
+                        let mut functions = HashMap::new();
+                        functions.insert("DirectObservation".to_string(), "exponential".to_string());
+                        functions.insert("IndirectInference".to_string(), "exponential".to_string());
+                        functions.insert("StatisticalCorrelation".to_string(), "linear".to_string());
+                        functions.insert("ExpertOpinion".to_string(), "power_law".to_string());
+                        functions.insert("ExperimentalResult".to_string(), "exponential".to_string());
+                        functions.insert("TheoreticalPrediction".to_string(), "logarithmic".to_string());
+                        functions
+                    },
+                },
+                optimization: OptimizationConfig {
+                    max_iterations: 1000,
+                    convergence_tolerance: 1e-6,
+                    algorithm: "variational_bayes".to_string(),
+                    learning_rate: 0.01,
+                    momentum: 0.9,
+                    parallel_optimization: true,
+                    optimization_workers: 4,
+                },
+                python_runtime: PythonRuntimeConfig {
+                    python_path: None,
+                    venv_path: Some("./venv".to_string()),
+                    python_paths: vec![],
+                    memory_limit_mb: 8192,
+                    enable_multiprocessing: true,
+                    worker_processes: 4,
+                    required_packages: vec![
+                        "numpy>=1.24.0".to_string(),
+                        "scipy>=1.10.0".to_string(),
+                        "networkx>=3.0".to_string(),
+                        "scikit-learn>=1.3.0".to_string(),
+                        "pandas>=2.0.0".to_string(),
+                    ],
+                },
+                network_structure: NetworkStructureConfig {
+                    max_nodes: 1000000,
+                    max_edges_per_node: 100,
+                    auto_prune_edges: true,
+                    edge_pruning_threshold: 0.1,
+                    hierarchical_structure: true,
+                    max_network_depth: 10,
+                    target_density: 0.1,
+                    dynamic_restructuring: true,
+                },
+                evidence_processing: EvidenceProcessingConfig {
+                    truth_dimension_weights: TruthDimensionWeights {
+                        factual_accuracy: 0.25,
+                        contextual_relevance: 0.20,
+                        temporal_validity: 0.15,
+                        source_credibility: 0.20,
+                        logical_consistency: 0.10,
+                        empirical_support: 0.10,
+                    },
+                    source_credibility_multipliers: {
+                        let mut multipliers = HashMap::new();
+                        multipliers.insert("HumanExpert".to_string(), 0.8);
+                        multipliers.insert("ScientificPublication".to_string(), 0.9);
+                        multipliers.insert("SensorData".to_string(), 0.95);
+                        multipliers.insert("RepositoryAnalysis".to_string(), 0.85);
+                        multipliers.insert("HistoricalRecord".to_string(), 0.7);
+                        multipliers.insert("Synthetic".to_string(), 0.6);
+                        multipliers
+                    },
+                    minimum_quality_threshold: 0.3,
+                    auto_validation: true,
+                    batch_processing: BatchProcessingConfig {
+                        batch_size: 100,
+                        timeout_seconds: 300,
+                        parallel_batches: true,
+                        max_concurrent_batches: 8,
+                    },
+                },
+            },
+            diggiden: DiggidenConfig {
+                enabled: true,
+                attack_frequency: 1.0,
+                max_attack_intensity: 1.0,
+                vulnerability_threshold: 0.5,
+                adaptive_strategies: true,
+                strategy_weights: HashMap::new(),
+                continuous_monitoring: true,
+                default_stealth_level: 0.5,
+            },
+            hatata: HatataConfig {
+                enabled: true,
+                discount_factor: 0.9,
+                learning_rate: 0.1,
+                convergence_threshold: 0.01,
+                max_iterations: 1000,
+                enable_sde: true,
+                time_step: 0.01,
+                utility_functions: UtilityFunctionConfig {
+                    default_weights: HashMap::new(),
+                    adaptive_learning: true,
+                    enabled_types: vec!["linear".to_string()],
+                    risk_preference: 0.5,
+                },
+                state_space: StateSpaceConfig {
+                    dimensions: 2,
+                    discretization_levels: 10,
+                    continuous_space: true,
+                    state_bounds: vec![(0.0, 1.0), (0.0, 1.0)],
                 },
             },
         }

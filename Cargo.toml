@@ -19,7 +19,11 @@ members = [
     "crates/preparation-engine",
     "crates/atp-manager",
     "crates/metacognitive-stack",
-    "crates/bloodhound-integration"
+    "crates/bloodhound-integration",
+    "crates/honjo-masamune-core",
+    "crates/bayesian-core",
+    "crates/diggiden",
+    "crates/hatata",
 ]
 
 [dependencies]

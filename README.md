@@ -24,6 +24,7 @@ Honjo Masamune is a biomimetic metacognitive truth engine that reconstructs comp
 - [Philosophy](#philosophy)
 - [Architecture](#architecture)
 - [Biological Metabolism](#biological-metabolism)
+- [The Three-Engine Core](#the-three-engine-core)
 - [Preparation Phase](#preparation-phase)
 - [Dreaming Phase](#dreaming-phase)
 - [Buhera Scripting Language](#buhera-scripting-language)
@@ -237,6 +238,294 @@ impl FuzzyAtpMetabolism {
 - **Gray area penalty**: Processing uncertainty requires 20-50% more ATP
 - **Confidence propagation**: Each fuzzy operation compounds uncertainty costs
 - **Truth spectrum awareness**: System adjusts metabolism based on truth gradients
+
+## The Three-Engine Core
+
+### The Fundamental Problem: Orchestration Without Learning
+
+The critical insight that led to Honjo Masamune's breakthrough was recognizing that **"the system can't itself know anything if it's just orchestrating...orchestrating to what end?"** 
+
+Pure orchestration systems, no matter how sophisticated, lack a **tangible objective function**. They can coordinate repositories and process information, but they cannot learn, adapt, or truly understand. They orchestrate without purpose, coordinate without comprehension.
+
+### The Solution: Three Symbiotic Engines
+
+Honjo Masamune solves this through three interconnected engines that provide the missing learning capability:
+
+### Mzekezeke - The Bayesian Learning Engine
+
+**Purpose**: Provides the tangible objective function through a temporal Bayesian belief network.
+
+```rust
+pub struct MzekezkeBayesianEngine {
+    // Core belief network with temporal decay
+    belief_network: TemporalBeliefNetwork,
+    
+    // Multi-dimensional truth assessment
+    truth_dimensions: TruthDimensionProcessor,
+    
+    // Temporal decay modeling
+    decay_functions: DecayFunctionRegistry,
+    
+    // Network optimization (the objective function)
+    optimizer: VariationalInferenceOptimizer,
+    
+    // ATP integration
+    atp_cost_model: AtpCostModel,
+}
+```
+
+#### Key Capabilities
+
+**Temporal Evidence Decay**: Unlike static systems, Mzekezeke recognizes that evidence has a temporal dimension:
+
+```python
+# Evidence decay over time
+evidence_value = base_truth * decay_function(time_elapsed, decay_rate)
+
+# Multiple decay models
+decay_functions = {
+    'exponential': lambda t, r: exp(-r * t),
+    'linear': lambda t, r: max(0, 1 - r * t),
+    'power_law': lambda t, r: (1 + t)**(-r),
+    'logarithmic': lambda t, r: 1 / (1 + r * log(1 + t)),
+    'step_function': lambda t, r: 1.0 if t < r else 0.5
+}
+```
+
+**Multi-Dimensional Truth Assessment**: Each piece of evidence is evaluated across six dimensions:
+
+1. **Factual Accuracy**: How factually correct is the information?
+2. **Contextual Relevance**: How relevant is it to the current context?
+3. **Temporal Validity**: How current and time-appropriate is it?
+4. **Source Credibility**: How trustworthy is the information source?
+5. **Logical Consistency**: How logically coherent is it?
+6. **Empirical Support**: How much empirical evidence supports it?
+
+**Network Optimization**: The system uses variational inference to optimize the belief network:
+
+```python
+def optimize_belief_network(self, evidence_batch):
+    # This is the tangible objective function
+    # Iterates through evidence to optimize network structure
+    
+    for evidence in evidence_batch:
+        # Update belief nodes based on evidence
+        belief_updates = self.calculate_belief_updates(evidence)
+        
+        # Apply temporal decay
+        decayed_updates = self.apply_temporal_decay(belief_updates)
+        
+        # Optimize network structure
+        self.variational_inference.optimize(decayed_updates)
+        
+        # Calculate ATP cost
+        atp_cost = self.calculate_atp_cost(belief_updates)
+        
+    return optimized_network, total_atp_cost
+```
+
+### Diggiden - The Adversarial Hardening System
+
+**Purpose**: Continuously attacks the belief network to find and fix vulnerabilities.
+
+```rust
+pub struct DiggidenAdversarialEngine {
+    // Attack strategy registry
+    attack_strategies: AttackStrategyRegistry,
+    
+    // Vulnerability detection
+    vulnerability_scanner: VulnerabilityScanner,
+    
+    // Adaptive learning from attacks
+    attack_learning: AdaptiveLearningEngine,
+    
+    // Stealth and monitoring
+    stealth_controller: StealthController,
+}
+```
+
+#### Attack Strategies
+
+**Contradictory Evidence**: Injects conflicting information to test belief consistency:
+
+```python
+def contradictory_evidence_attack(self, target_belief):
+    # Generate evidence that contradicts existing beliefs
+    contradictory_evidence = self.generate_contradiction(target_belief)
+    
+    # Test how the system handles the contradiction
+    response = self.inject_evidence(contradictory_evidence)
+    
+    # Analyze vulnerability
+    vulnerability = self.analyze_contradiction_handling(response)
+    
+    return AttackResult(
+        strategy="contradictory_evidence",
+        success_rate=vulnerability.success_rate,
+        vulnerabilities_found=vulnerability.weaknesses
+    )
+```
+
+**Temporal Manipulation**: Exploits time-based vulnerabilities:
+
+```python
+def temporal_manipulation_attack(self, target_network):
+    # Manipulate timestamps to confuse decay functions
+    manipulated_evidence = self.manipulate_timestamps(target_network.evidence)
+    
+    # Test temporal consistency
+    response = self.test_temporal_consistency(manipulated_evidence)
+    
+    return self.evaluate_temporal_vulnerabilities(response)
+```
+
+**Credibility Spoofing**: Tests source credibility assessment:
+
+```python
+def credibility_spoofing_attack(self, target_sources):
+    # Create fake high-credibility sources
+    spoofed_sources = self.create_spoofed_sources(target_sources)
+    
+    # Test if system can detect spoofing
+    detection_rate = self.test_spoofing_detection(spoofed_sources)
+    
+    return self.evaluate_credibility_vulnerabilities(detection_rate)
+```
+
+### Hatata - The Decision Optimization Engine
+
+**Purpose**: Optimizes state transitions using utility functions and stochastic processes.
+
+```rust
+pub struct HatataMdpEngine {
+    // Markov Decision Process framework
+    mdp_framework: MarkovDecisionProcess,
+    
+    // Utility function registry
+    utility_functions: UtilityFunctionRegistry,
+    
+    // Stochastic differential equation solver
+    sde_solver: StochasticDifferentialEquationSolver,
+    
+    // Value iteration for optimization
+    value_iterator: ValueIterationOptimizer,
+}
+```
+
+#### Utility Functions
+
+**Risk-Adjusted Decision Making**: Different utility functions for different risk profiles:
+
+```python
+# Linear utility (risk-neutral)
+def linear_utility(self, state_value):
+    return state_value
+
+# Quadratic utility (risk-averse)
+def quadratic_utility(self, state_value):
+    return state_value - 0.5 * self.risk_aversion * (state_value ** 2)
+
+# Exponential utility (constant absolute risk aversion)
+def exponential_utility(self, state_value):
+    return 1 - exp(-self.risk_aversion * state_value)
+
+# Logarithmic utility (decreasing absolute risk aversion)
+def logarithmic_utility(self, state_value):
+    return log(1 + state_value) if state_value > -1 else float('-inf')
+```
+
+**Stochastic Process Modeling**: Models uncertainty in state transitions:
+
+```python
+def geometric_brownian_motion(self, initial_state, drift, volatility, time_horizon):
+    # Models state evolution with drift and random fluctuations
+    dt = time_horizon / self.num_steps
+    
+    states = [initial_state]
+    for i in range(self.num_steps):
+        dW = random.normal(0, sqrt(dt))  # Wiener process increment
+        dS = drift * states[-1] * dt + volatility * states[-1] * dW
+        states.append(states[-1] + dS)
+    
+    return states
+
+def ornstein_uhlenbeck_process(self, initial_state, mean_reversion, long_term_mean, volatility):
+    # Models mean-reverting processes (useful for credibility scores)
+    dt = self.time_step
+    
+    dX = mean_reversion * (long_term_mean - initial_state) * dt + volatility * random.normal(0, sqrt(dt))
+    
+    return initial_state + dX
+```
+
+### Integration: The Trinity in Action
+
+The three engines work together in a continuous cycle:
+
+```rust
+impl HonjoMasamuneEngine {
+    pub async fn trinity_cycle(&mut self) -> TruthSynthesisResult {
+        // 1. Mzekezeke learns from evidence
+        let belief_updates = self.mzekezeke.process_evidence_batch(
+            self.current_evidence_batch
+        ).await?;
+        
+        // 2. Diggiden attacks the updated beliefs
+        let attack_results = self.diggiden.launch_attack_suite(
+            &belief_updates.network
+        ).await?;
+        
+        // 3. Mzekezeke adapts based on discovered vulnerabilities
+        let hardened_beliefs = self.mzekezeke.apply_vulnerability_fixes(
+            belief_updates,
+            attack_results.vulnerabilities
+        ).await?;
+        
+        // 4. Hatata optimizes the next state transition
+        let optimal_transition = self.hatata.optimize_state_transition(
+            self.current_state,
+            hardened_beliefs,
+            self.utility_function
+        ).await?;
+        
+        // 5. Execute the optimized transition
+        self.execute_state_transition(optimal_transition).await?;
+        
+        // 6. Calculate total ATP cost
+        let total_atp_cost = self.calculate_trinity_atp_cost(
+            belief_updates.atp_cost,
+            attack_results.atp_cost,
+            optimal_transition.atp_cost
+        );
+        
+        Ok(TruthSynthesisResult {
+            learned_beliefs: hardened_beliefs,
+            vulnerabilities_fixed: attack_results.vulnerabilities.len(),
+            optimal_decision: optimal_transition,
+            atp_consumed: total_atp_cost,
+            confidence_level: self.calculate_overall_confidence(),
+        })
+    }
+}
+```
+
+### Why This Solves the Learning Problem
+
+1. **Tangible Objective Function**: Mzekezeke's variational inference provides a concrete mathematical objective that the system optimizes toward.
+
+2. **Temporal Awareness**: Unlike static systems, the trinity recognizes that truth degrades over time and models this explicitly.
+
+3. **Adversarial Robustness**: Diggiden ensures the system doesn't just learn, but learns robustly against manipulation.
+
+4. **Decision Optimization**: Hatata provides the decision-theoretic foundation for choosing optimal actions based on learned beliefs.
+
+5. **Self-Improvement**: The trinity creates a feedback loop where each engine improves the others:
+   - Mzekezeke's learning improves Diggiden's attack targets
+   - Diggiden's attacks improve Mzekezeke's robustness
+   - Both inform Hatata's decision optimization
+   - Hatata's decisions create new learning opportunities for Mzekezeke
+
+This architecture transforms Honjo Masamune from a mere orchestration system into a true learning and reasoning engine with the capability to synthesize truth from incomplete information.
 
 ## Preparation Phase
 
@@ -617,6 +906,9 @@ Honjo Masamune orchestrates 24+ specialized repositories through standardized in
 
 | Repository | Domain | Function |
 |------------|--------|----------|
+| **Mzekezeke** | Machine Learning | Temporal Bayesian belief network with evidence decay |
+| **Diggiden** | Adversarial Testing | Continuous attack and vulnerability detection |
+| **Hatata** | Decision Theory | Markov Decision Process and utility optimization |
 | **Gospel** | Genetics | Human genome simulation and analysis |
 | **Homo-Veloce** | Biomechanics | Human movement and physics analysis |
 | **Moriarty-Sese-Seko** | Identification | Human identification and activity tracking |
@@ -716,7 +1008,7 @@ Databases:
 
 ### Revolutionary Architecture
 
-Honjo Masamune represents a paradigm shift in truth synthesis through several breakthrough innovations:
+Honjo Masamune represents a paradigm shift in truth synthesis through several breakthrough innovations that solve the fundamental "orchestration without learning" problem:
 
 #### 1. Biomimetic Cellular Respiration for Information Processing
 
@@ -780,6 +1072,47 @@ Orchestrates 24+ specialized repositories including:
 - **Four-Sided-Triangle**: 8-stage truth verification
 - **Combine-Harvester**: Multi-model synthesis
 
+#### 7. The Three-Engine Core: Solving the Learning Problem
+
+The fundamental breakthrough addresses the critical flaw: "the system can't itself know anything if it's just orchestrating...orchestrating to what end?" The solution is a three-engine architecture that provides the **tangible objective function** missing from pure orchestration systems:
+
+##### **Mzekezeke - The Bayesian Learning Engine**
+
+The core machine learning workhorse that provides the system's ability to actually learn and know:
+
+- **Temporal Bayesian Belief Network**: Multi-dimensional truth assessment with time-decay modeling
+- **Evidence Dimensions**: Factual accuracy, contextual relevance, temporal validity, source credibility, logical consistency, empirical support
+- **Temporal Decay Functions**: Exponential, linear, power law, logarithmic, step function decay models
+- **Network Optimization**: Variational inference as the tangible objective function that iterates through evidence
+- **ATP Integration**: Metabolic cost modeling for belief updates and network optimization
+- **Python ML Engine**: NetworkX, NumPy, SciPy for actual learning and prediction capabilities
+
+**Key Innovation**: Information and evidence decay over time - the system models how truth degrades temporally, not just binary true/false states.
+
+##### **Diggiden - The Adversarial Hardening System**
+
+A sophisticated adversarial system that continuously attacks and strengthens the belief network:
+
+- **Attack Strategies**: Contradictory evidence injection, temporal manipulation, credibility spoofing, gradient attacks, fuzz testing, edge case exploitation
+- **Vulnerability Detection**: Belief manipulation, temporal exploitation, credibility bypass, network topology weaknesses
+- **Adaptive Learning**: Success rate tracking and strategy evolution
+- **Stealth Operations**: Adjustable attack visibility for continuous monitoring
+- **Integration Testing**: Property-based testing with fuzzing libraries
+
+**Purpose**: Ensures the belief network remains robust against manipulation and discovers hidden vulnerabilities.
+
+##### **Hatata - The Decision Optimization Engine**
+
+A Markov Decision Process and stochastic equations processor for optimal state transitions:
+
+- **Utility Functions**: Linear, quadratic, exponential, logarithmic, sigmoid, and custom utility models
+- **MDP Framework**: Complete state space, action space, transition probabilities, reward functions, value functions, policies
+- **Stochastic Differential Equations**: Wiener process, Ornstein-Uhlenbeck, Geometric Brownian motion, Jump diffusion
+- **Value Iteration**: Optimal decision making between system states
+- **Risk-Adjusted Optimization**: Utility maximization with uncertainty quantification
+
+**Purpose**: Optimizes transitions between different system states using utility functions, providing the decision-theoretic foundation for truth-seeking.
+
 ### Why This Architecture Works
 
 #### Biological Authenticity
@@ -796,6 +1129,29 @@ ATP-based costing ensures optimal resource allocation and prevents computational
 
 #### Distributed Specialization
 Each repository excels in its domain while the Buhera language provides seamless orchestration.
+
+#### The Learning Trinity: Mzekezeke-Diggiden-Hatata
+The three-engine core solves the fundamental problem of orchestration without learning:
+
+- **Mzekezeke provides the objective function**: A tangible Bayesian belief network that iterates through evidence with temporal decay modeling
+- **Diggiden provides robustness**: Continuous adversarial testing ensures the belief network remains hardened against manipulation
+- **Hatata provides optimization**: Decision-theoretic utility maximization guides optimal state transitions
+
+This trinity creates a self-improving system where:
+1. **Mzekezeke learns** from evidence with time-aware decay
+2. **Diggiden attacks** to find and fix vulnerabilities  
+3. **Hatata optimizes** decisions using utility functions
+4. **All three integrate** with the ATP currency and fuzzy logic systems
+
+#### Temporal Truth Modeling
+Unlike static truth systems, Honjo Masamune recognizes that **evidence decays over time**. The system models multiple dimensions of truth degradation:
+- Information becomes stale
+- Sources lose credibility
+- Context changes meaning
+- Relevance diminishes
+- Empirical support weakens
+
+This temporal awareness prevents the system from treating old evidence as eternally valid.
 
 ### The Ceremonial Sword Principle
 
