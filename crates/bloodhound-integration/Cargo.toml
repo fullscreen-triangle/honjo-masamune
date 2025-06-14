@@ -1,0 +1,33 @@
+[package]
+name = "bloodhound-integration"
+version = "0.1.0"
+edition = "2021"
+description = "Bloodhound local-first processing integration for Honjo Masamune"
+authors = ["Honjo Masamune Team"]
+
+[dependencies]
+anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+uuid = { version = "1.0", features = ["v4"] }
+dashmap = "5.0"
+parking_lot = "0.12"
+futures = "0.3"
+async-trait = "0.1"
+
+# Bloodhound-inspired dependencies
+libp2p = "0.53"
+reqwest = { version = "0.11", features = ["json"] }
+sha2 = "0.10"
+rand = "0.8"
+num_cpus = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Local crates
+fuzzy-logic-core = { path = "../fuzzy-logic" }
+atp-manager = { path = "../atp-manager" }
+
+[dev-dependencies]
+tokio-test = "0.4" 

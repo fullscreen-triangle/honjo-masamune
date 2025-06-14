@@ -18,7 +18,8 @@ members = [
     "crates/dreaming-module",
     "crates/preparation-engine",
     "crates/atp-manager",
-    "crates/metacognitive-stack"
+    "crates/metacognitive-stack",
+    "crates/bloodhound-integration"
 ]
 
 [dependencies]
@@ -81,6 +82,7 @@ dreaming-module = { path = "crates/dreaming-module" }
 preparation-engine = { path = "crates/preparation-engine" }
 atp-manager = { path = "crates/atp-manager" }
 metacognitive-stack = { path = "crates/metacognitive-stack" }
+bloodhound-integration = { path = "crates/bloodhound-integration" }
 
 [dev-dependencies]
 criterion = "0.5"

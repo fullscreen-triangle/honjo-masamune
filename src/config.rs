@@ -16,6 +16,7 @@ pub struct HonjoMasamuneConfig {
     pub security: SecurityConfig,
     pub ceremonial: CeremonialConfig,
     pub development: DevelopmentConfig,
+    pub bloodhound: BloodhoundConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -384,6 +385,57 @@ pub struct DevelopmentConfig {
     pub allow_low_confidence: bool,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BloodhoundConfig {
+    pub local_first: LocalFirstConfig,
+    pub federated_learning: FederatedLearningConfig,
+    pub zero_config: ZeroConfigConfig,
+    pub data_sovereignty: DataSovereigntyConfig,
+    pub conversational_ai: ConversationalAiConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LocalFirstConfig {
+    pub enabled: bool,
+    pub auto_resource_detection: bool,
+    pub local_processing_priority: bool,
+    pub data_never_leaves_source: bool,
+    pub pattern_sharing_only: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FederatedLearningConfig {
+    pub enabled: bool,
+    pub privacy_preserving: bool,
+    pub consensus_threshold: f64,
+    pub minimum_participants: u32,
+    pub cross_validation_required: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ZeroConfigConfig {
+    pub auto_optimization: bool,
+    pub self_healing: bool,
+    pub intelligent_resource_allocation: bool,
+    pub minimal_user_intervention: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DataSovereigntyConfig {
+    pub enforce_local_processing: bool,
+    pub p2p_only_when_necessary: bool,
+    pub automatic_data_health_checks: bool,
+    pub direct_lab_to_lab_transfer: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ConversationalAiConfig {
+    pub natural_language_interface: bool,
+    pub automatic_assumption_validation: bool,
+    pub intelligent_test_selection: bool,
+    pub plain_language_explanations: bool,
+}
+
 impl HonjoMasamuneConfig {
     /// Load configuration from a YAML file
     pub async fn load<P: AsRef<Path>>(path: P) -> Result<Self> {
@@ -669,6 +721,40 @@ impl Default for HonjoMasamuneConfig {
                 fast_preparation: false,
                 skip_verification: false,
                 allow_low_confidence: true,
+            },
+            bloodhound: BloodhoundConfig {
+                local_first: LocalFirstConfig {
+                    enabled: true,
+                    auto_resource_detection: true,
+                    local_processing_priority: true,
+                    data_never_leaves_source: true,
+                    pattern_sharing_only: true,
+                },
+                federated_learning: FederatedLearningConfig {
+                    enabled: true,
+                    privacy_preserving: true,
+                    consensus_threshold: 0.7,
+                    minimum_participants: 5,
+                    cross_validation_required: true,
+                },
+                zero_config: ZeroConfigConfig {
+                    auto_optimization: true,
+                    self_healing: true,
+                    intelligent_resource_allocation: true,
+                    minimal_user_intervention: true,
+                },
+                data_sovereignty: DataSovereigntyConfig {
+                    enforce_local_processing: true,
+                    p2p_only_when_necessary: true,
+                    automatic_data_health_checks: true,
+                    direct_lab_to_lab_transfer: true,
+                },
+                conversational_ai: ConversationalAiConfig {
+                    natural_language_interface: true,
+                    automatic_assumption_validation: true,
+                    intelligent_test_selection: true,
+                    plain_language_explanations: true,
+                },
             },
         }
     }
