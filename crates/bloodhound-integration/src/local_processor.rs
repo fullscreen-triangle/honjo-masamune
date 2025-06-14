@@ -7,6 +7,7 @@ use crate::{DataSource, ValidationPattern, LocalFirstProcessor};
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use sha2::Digest;
 use std::path::Path;
 use tracing::{info, debug};
 
@@ -159,9 +160,10 @@ impl LocalProcessor {
         debug!("Processing local database: {} with query: {}", connection_string, query);
         
         // Simplified database processing
+        let hash = sha2::Sha256::digest(query.as_bytes());
         Ok(vec![
             ValidationPattern {
-                pattern_hash: format!("db_pattern_{}", sha2::Sha256::digest(query.as_bytes())),
+                pattern_hash: format!("db_pattern_{:x}", hash),
                 confidence: 0.8,
                 source_count: 1,
             }

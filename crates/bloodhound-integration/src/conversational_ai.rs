@@ -162,7 +162,7 @@ impl ConversationalInterface {
     
     async fn convert_to_structured_query(&self, question: &str, analysis: &QuestionAnalysis) -> Result<String> {
         // Convert natural language to structured query
-        match analysis.intent {
+        let result = match analysis.intent {
             QueryIntent::TruthSynthesis => {
                 format!("SYNTHESIZE_TRUTH: {}", question)
             },
@@ -181,7 +181,8 @@ impl ConversationalInterface {
             QueryIntent::Explanation => {
                 format!("EXPLAIN: {}", question)
             },
-        }
+        };
+        Ok(result)
     }
     
     fn determine_validation_needs(&self, analysis: &QuestionAnalysis) -> bool {
@@ -191,12 +192,12 @@ impl ConversationalInterface {
     }
     
     async fn create_simple_explanation(&self, result: &FuzzyResult<String>, _question: &str) -> Result<String> {
-        let confidence_percent = (result.truth_value().value() * 100.0) as u32;
+        let confidence_percent = (result.confidence.value() * 100.0) as u32;
         
         Ok(format!(
             "Based on my analysis, I'm {}% confident that: {}\n\n{}",
             confidence_percent,
-            result.value(),
+            result.value,
             if confidence_percent >= 80 {
                 "This is a high-confidence result."
             } else if confidence_percent >= 60 {
@@ -208,8 +209,8 @@ impl ConversationalInterface {
     }
     
     async fn create_detailed_explanation(&self, result: &FuzzyResult<String>, question: &str) -> Result<String> {
-        let confidence_percent = (result.truth_value().value() * 100.0) as u32;
-        let confidence_interval = result.confidence_interval();
+        let confidence_percent = (result.confidence.value() * 100.0) as u32;
+        let confidence_interval = &result.confidence_interval;
         
         let mut explanation = format!(
             "## Analysis Results for: \"{}\"\n\n",
@@ -218,7 +219,7 @@ impl ConversationalInterface {
         
         explanation.push_str(&format!(
             "**Finding:** {}\n\n",
-            result.value()
+            result.value
         ));
         
         explanation.push_str(&format!(
@@ -228,17 +229,17 @@ impl ConversationalInterface {
             confidence_interval.upper_bound() * 100.0
         ));
         
-        if !result.uncertainty_sources().is_empty() {
+        if !result.uncertainty_sources.is_empty() {
             explanation.push_str("**Uncertainty Sources:**\n");
-            for source in result.uncertainty_sources() {
+            for source in &result.uncertainty_sources {
                 explanation.push_str(&format!("- {}\n", source));
             }
             explanation.push('\n');
         }
         
-        if !result.gray_areas().is_empty() {
+        if !result.gray_areas.is_empty() {
             explanation.push_str("**Areas Requiring Human Judgment:**\n");
-            for area in result.gray_areas() {
+            for area in &result.gray_areas {
                 explanation.push_str(&format!("- {}\n", area));
             }
             explanation.push('\n');
@@ -257,15 +258,15 @@ impl ConversationalInterface {
         
         explanation.push_str(&format!(
             "**Result:** {}\n\n",
-            result.value()
+            result.value
         ));
         
         explanation.push_str(&format!(
             "**Truth Value:** {:.6}\n",
-            result.truth_value().value()
+            result.confidence.value()
         ));
         
-        let ci = result.confidence_interval();
+        let ci = &result.confidence_interval;
         explanation.push_str(&format!(
             "**Confidence Interval:** [{:.6}, {:.6}] at {:.1}% confidence\n\n",
             ci.lower_bound(),
@@ -273,17 +274,17 @@ impl ConversationalInterface {
             ci.confidence_level() * 100.0
         ));
         
-        if !result.uncertainty_sources().is_empty() {
+        if !result.uncertainty_sources.is_empty() {
             explanation.push_str("**Uncertainty Analysis:**\n");
-            for (i, source) in result.uncertainty_sources().iter().enumerate() {
+            for (i, source) in result.uncertainty_sources.iter().enumerate() {
                 explanation.push_str(&format!("{}. {}\n", i + 1, source));
             }
             explanation.push('\n');
         }
         
-        if !result.gray_areas().is_empty() {
+        if !result.gray_areas.is_empty() {
             explanation.push_str("**Gray Area Analysis:**\n");
-            for (i, area) in result.gray_areas().iter().enumerate() {
+            for (i, area) in result.gray_areas.iter().enumerate() {
                 explanation.push_str(&format!("{}. {}\n", i + 1, area));
             }
             explanation.push('\n');

@@ -15,12 +15,10 @@ use anyhow::Result;
 use async_trait::async_trait;
 use dashmap::DashMap;
 use fuzzy_logic_core::{FuzzyTruth, FuzzyResult};
-use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::sync::Arc;
-use tokio::sync::mpsc;
-use tracing::{info, warn, error};
+use tracing::{info, warn};
 use uuid::Uuid;
 
 pub mod local_processor;
@@ -328,7 +326,6 @@ impl BloodhoundIntegration {
             vec![], // gray areas
             fuzzy_logic_core::ConfidenceInterval::new(
                 final_confidence - 0.1,
-                final_confidence,
                 final_confidence + 0.1,
                 0.95
             ),

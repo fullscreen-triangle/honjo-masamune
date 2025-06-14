@@ -7,7 +7,6 @@ use crate::{ValidationPattern, FederatedConsensus, FederatedValidator, Validatio
 use crate::zero_config::NetworkConfig;
 use anyhow::Result;
 use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tracing::{info, debug, warn};
 use uuid::Uuid;
@@ -142,7 +141,7 @@ impl FederatedLearning {
     async fn calculate_consensus(
         &self,
         responses: &[ValidationResponse],
-        minimum_threshold: f64,
+        _minimum_threshold: f64,
     ) -> Result<FederatedConsensus> {
         if responses.is_empty() {
             return Ok(FederatedConsensus {
