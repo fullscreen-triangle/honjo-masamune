@@ -22,6 +22,7 @@ use crate::mzekezeke::{MzekezekeEngine, Evidence, Hypothesis};
 use crate::diggiden::{DiggidenEngine, AttackCampaignConfig, AttackIntensity};
 use crate::hatata::{HatataEngine, ActionOption, ActionType, ResourceRequirements};
 use crate::zengeza::{ZengezaEngine, CommunicationContext, NoiseAnalysisResult, DenoisedStatement, NoiseStatistics};
+use crate::diadochi::{DiadochiEngine, CombinationResult};
 
 /// Main Honjo Masamune Truth Engine
 #[derive(Debug)]
@@ -36,6 +37,7 @@ pub struct HonjoMasamuneEngine {
     diggiden_engine: Arc<DiggidenEngine>,
     hatata_engine: Arc<HatataEngine>,
     zengeza_engine: Arc<ZengezaEngine>,
+    diadochi_engine: Arc<DiadochiEngine>,
     session_state: Arc<RwLock<SessionState>>,
     query_history: Arc<RwLock<Vec<QueryRecord>>>,
 }
@@ -87,6 +89,11 @@ impl HonjoMasamuneEngine {
             atp_manager.clone(),
         ));
 
+        // Initialize diadochi engine
+        let diadochi_engine = Arc::new(DiadochiEngine::new(
+            config.diadochi.clone(),
+        ));
+
         let engine = Self {
             config,
             atp_manager,
@@ -98,6 +105,7 @@ impl HonjoMasamuneEngine {
             diggiden_engine,
             hatata_engine,
             zengeza_engine,
+            diadochi_engine,
             session_state,
             query_history,
         };
@@ -326,6 +334,52 @@ impl HonjoMasamuneEngine {
     /// Denoise a statement based on noise analysis
     pub async fn denoise_statement(&self, statement: &str, noise_analysis: &NoiseAnalysisResult) -> Result<DenoisedStatement> {
         self.zengeza_engine.denoise_statement(statement, noise_analysis).await
+    }
+
+    /// Combine multiple models intelligently using diadochi
+    pub async fn intelligent_model_combination(&self, query: &str) -> Result<CombinationResult> {
+        // Use a temporary clone of the diadochi engine
+        let config = self.config.diadochi.clone();
+        let mut temp_engine = DiadochiEngine::new(config);
+        temp_engine.intelligent_combine(query)
+    }
+
+    /// Use router-based ensemble pattern
+    pub async fn router_ensemble_combination(&self, query: &str, router_id: &str) -> Result<CombinationResult> {
+        let config = self.config.diadochi.clone();
+        let mut temp_engine = DiadochiEngine::new(config);
+        temp_engine.router_ensemble(query, router_id)
+    }
+
+    /// Use sequential chaining pattern
+    pub async fn sequential_chain_combination(&self, query: &str, chain_id: &str) -> Result<CombinationResult> {
+        let config = self.config.diadochi.clone();
+        let mut temp_engine = DiadochiEngine::new(config);
+        temp_engine.sequential_chain(query, chain_id)
+    }
+
+    /// Use mixture of experts pattern
+    pub async fn mixture_of_experts_combination(&self, query: &str, mixture_id: &str) -> Result<CombinationResult> {
+        let config = self.config.diadochi.clone();
+        let mut temp_engine = DiadochiEngine::new(config);
+        temp_engine.mixture_of_experts(query, mixture_id)
+    }
+
+    /// Use specialized system prompts pattern
+    pub async fn system_prompt_combination(&self, query: &str, prompt_id: &str) -> Result<CombinationResult> {
+        let config = self.config.diadochi.clone();
+        let mut temp_engine = DiadochiEngine::new(config);
+        temp_engine.specialized_system_prompt(query, prompt_id)
+    }
+
+    /// Get diadochi engine statistics
+    pub async fn get_diadochi_statistics(&self) -> crate::diadochi::DiadochiStatistics {
+        self.diadochi_engine.get_statistics().clone()
+    }
+
+    /// Export diadochi results
+    pub async fn export_diadochi_results(&self) -> Result<String> {
+        self.diadochi_engine.export_results()
     }
 
     /// Initialize ceremonial mode restrictions

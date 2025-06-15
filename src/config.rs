@@ -23,6 +23,7 @@ pub struct HonjoMasamuneConfig {
     pub zengeza_noise: ZengezaNoiseConfig,
     pub spectacular: SpectacularConfig,
     pub nicotine: NicotineConfig,
+    pub diadochi: DiadochiConfig,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -827,6 +828,95 @@ pub struct NicotineAtpCosts {
     pub validation_cost: u64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DiadochiConfig {
+    /// Enable the diadochi model combination engine
+    pub enabled: bool,
+    
+    /// Base ATP cost for model combination operations
+    pub base_combination_cost: u32,
+    
+    /// Maximum combination history to maintain
+    pub max_history_size: usize,
+    
+    /// Default domain experts configuration
+    pub default_experts: Vec<DomainExpertConfig>,
+    
+    /// Router strategies configuration
+    pub router_strategies: HashMap<String, RouterStrategyConfig>,
+    
+    /// Chain configurations
+    pub chain_configurations: HashMap<String, ChainConfigInfo>,
+    
+    /// Mixture configurations
+    pub mixture_configurations: HashMap<String, MixtureConfigInfo>,
+    
+    /// System prompt configurations
+    pub system_prompts: HashMap<String, SystemPromptInfo>,
+    
+    /// Performance thresholds
+    pub performance_thresholds: PerformanceThresholds,
+    
+    /// ATP costs for different operations
+    pub atp_costs: DiadochiAtpCosts,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DomainExpertConfig {
+    pub name: String,
+    pub domain: String,
+    pub specialization: Vec<String>,
+    pub confidence_threshold: f64,
+    pub performance_score: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RouterStrategyConfig {
+    pub strategy_type: String,
+    pub threshold: f64,
+    pub keywords: HashMap<String, Vec<String>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChainConfigInfo {
+    pub expert_sequence: Vec<String>,
+    pub max_context_length: usize,
+    pub summarization_threshold: usize,
+    pub context_strategy: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MixtureConfigInfo {
+    pub experts: Vec<String>,
+    pub weighting_strategy: String,
+    pub synthesis_method: String,
+    pub confidence_estimator: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SystemPromptInfo {
+    pub base_prompt: String,
+    pub domains: Vec<String>,
+    pub integration_guidelines: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PerformanceThresholds {
+    pub minimum_integration_coherence: f64,
+    pub minimum_response_quality: f64,
+    pub success_threshold: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DiadochiAtpCosts {
+    pub router_cost: u32,
+    pub chain_cost_per_expert: u32,
+    pub mixture_base_cost: u32,
+    pub mixture_cost_per_expert: u32,
+    pub system_prompt_cost: u32,
+    pub synthesis_cost: u32,
+}
+
 impl HonjoMasamuneConfig {
     /// Load configuration from a YAML file
     pub async fn load<P: AsRef<Path>>(path: P) -> Result<Self> {
@@ -1368,6 +1458,89 @@ impl Default for HonjoMasamuneConfig {
                     validation_cost: 50,
                 },
             },
+            diadochi: DiadochiConfig {
+                enabled: true,
+                base_combination_cost: 100,
+                max_history_size: 1000,
+                default_experts: vec![
+                    DomainExpertConfig {
+                        name: "biomechanics".to_string(),
+                        domain: "biomechanics".to_string(),
+                        specialization: vec!["kinematics".to_string(), "kinetics".to_string(), "motor_control".to_string()],
+                        confidence_threshold: 0.8,
+                        performance_score: 0.85,
+                    },
+                    DomainExpertConfig {
+                        name: "physiology".to_string(),
+                        domain: "physiology".to_string(),
+                        specialization: vec!["exercise_physiology".to_string(), "metabolism".to_string(), "cardiovascular".to_string()],
+                        confidence_threshold: 0.8,
+                        performance_score: 0.82,
+                    },
+                    DomainExpertConfig {
+                        name: "nutrition".to_string(),
+                        domain: "nutrition".to_string(),
+                        specialization: vec!["sports_nutrition".to_string(), "macronutrients".to_string(), "supplementation".to_string()],
+                        confidence_threshold: 0.8,
+                        performance_score: 0.80,
+                    },
+                ],
+                router_strategies: {
+                    let mut strategies = HashMap::new();
+                    strategies.insert("default_router".to_string(), RouterStrategyConfig {
+                        strategy_type: "embedding".to_string(),
+                        threshold: 0.7,
+                        keywords: [
+                            ("biomechanics".to_string(), vec!["movement".to_string(), "force".to_string(), "kinetics".to_string()]),
+                            ("physiology".to_string(), vec!["muscle".to_string(), "energy".to_string(), "metabolism".to_string()]),
+                            ("nutrition".to_string(), vec!["diet".to_string(), "protein".to_string(), "carbohydrate".to_string()]),
+                        ].iter().cloned().collect(),
+                    });
+                    strategies
+                },
+                chain_configurations: {
+                    let mut configurations = HashMap::new();
+                    configurations.insert("default_chain".to_string(), ChainConfigInfo {
+                        expert_sequence: vec!["biomechanics".to_string(), "physiology".to_string(), "nutrition".to_string()],
+                        max_context_length: 4000,
+                        summarization_threshold: 2000,
+                        context_strategy: "Summarized".to_string(),
+                    });
+                    configurations
+                },
+                mixture_configurations: {
+                    let mut configurations = HashMap::new();
+                    configurations.insert("default_mixture".to_string(), MixtureConfigInfo {
+                        experts: vec!["biomechanics".to_string(), "physiology".to_string(), "nutrition".to_string()],
+                        weighting_strategy: "Softmax".to_string(),
+                        synthesis_method: "LLMSynthesis".to_string(),
+                        confidence_estimator: "Embedding".to_string(),
+                    });
+                    configurations
+                },
+                system_prompts: {
+                    let mut prompts = HashMap::new();
+                    prompts.insert("default_system_prompt".to_string(), SystemPromptInfo {
+                        base_prompt: "You are an expert in multiple domains with the ability to integrate knowledge across disciplines.".to_string(),
+                        domains: vec!["biomechanics".to_string(), "physiology".to_string(), "nutrition".to_string()],
+                        integration_guidelines: "Provide integrated responses that synthesize insights from all relevant domains while maintaining coherence and avoiding contradictions.".to_string(),
+                    });
+                    prompts
+                },
+                performance_thresholds: PerformanceThresholds {
+                    minimum_integration_coherence: 0.7,
+                    minimum_response_quality: 0.7,
+                    success_threshold: 0.75,
+                },
+                atp_costs: DiadochiAtpCosts {
+                    router_cost: 50,
+                    chain_cost_per_expert: 150,
+                    mixture_base_cost: 100,
+                    mixture_cost_per_expert: 200,
+                    system_prompt_cost: 75,
+                    synthesis_cost: 100,
+                },
+            },
         }
     }
 }
@@ -1593,6 +1766,90 @@ impl Default for ZengezaNoiseConfig {
             batch_processing: false,
             max_concurrent_analyses: 4,
             analysis_timeout_seconds: 30,
+        }
+    }
+}
+
+impl Default for DiadochiConfig {
+    fn default() -> Self {
+        let mut router_strategies = HashMap::new();
+        router_strategies.insert("default_router".to_string(), RouterStrategyConfig {
+            strategy_type: "embedding".to_string(),
+            threshold: 0.7,
+            keywords: [
+                ("biomechanics".to_string(), vec!["movement".to_string(), "force".to_string(), "kinetics".to_string()]),
+                ("physiology".to_string(), vec!["muscle".to_string(), "energy".to_string(), "metabolism".to_string()]),
+                ("nutrition".to_string(), vec!["diet".to_string(), "protein".to_string(), "carbohydrate".to_string()]),
+            ].iter().cloned().collect(),
+        });
+
+        let mut chain_configurations = HashMap::new();
+        chain_configurations.insert("default_chain".to_string(), ChainConfigInfo {
+            expert_sequence: vec!["biomechanics".to_string(), "physiology".to_string(), "nutrition".to_string()],
+            max_context_length: 4000,
+            summarization_threshold: 2000,
+            context_strategy: "Summarized".to_string(),
+        });
+
+        let mut mixture_configurations = HashMap::new();
+        mixture_configurations.insert("default_mixture".to_string(), MixtureConfigInfo {
+            experts: vec!["biomechanics".to_string(), "physiology".to_string(), "nutrition".to_string()],
+            weighting_strategy: "Softmax".to_string(),
+            synthesis_method: "LLMSynthesis".to_string(),
+            confidence_estimator: "Embedding".to_string(),
+        });
+
+        let mut system_prompts = HashMap::new();
+        system_prompts.insert("default_system_prompt".to_string(), SystemPromptInfo {
+            base_prompt: "You are an expert in multiple domains with the ability to integrate knowledge across disciplines.".to_string(),
+            domains: vec!["biomechanics".to_string(), "physiology".to_string(), "nutrition".to_string()],
+            integration_guidelines: "Provide integrated responses that synthesize insights from all relevant domains while maintaining coherence and avoiding contradictions.".to_string(),
+        });
+
+        Self {
+            enabled: true,
+            base_combination_cost: 100,
+            max_history_size: 1000,
+            default_experts: vec![
+                DomainExpertConfig {
+                    name: "biomechanics".to_string(),
+                    domain: "biomechanics".to_string(),
+                    specialization: vec!["kinematics".to_string(), "kinetics".to_string(), "motor_control".to_string()],
+                    confidence_threshold: 0.8,
+                    performance_score: 0.85,
+                },
+                DomainExpertConfig {
+                    name: "physiology".to_string(),
+                    domain: "physiology".to_string(),
+                    specialization: vec!["exercise_physiology".to_string(), "metabolism".to_string(), "cardiovascular".to_string()],
+                    confidence_threshold: 0.8,
+                    performance_score: 0.82,
+                },
+                DomainExpertConfig {
+                    name: "nutrition".to_string(),
+                    domain: "nutrition".to_string(),
+                    specialization: vec!["sports_nutrition".to_string(), "macronutrients".to_string(), "supplementation".to_string()],
+                    confidence_threshold: 0.8,
+                    performance_score: 0.80,
+                },
+            ],
+            router_strategies,
+            chain_configurations,
+            mixture_configurations,
+            system_prompts,
+            performance_thresholds: PerformanceThresholds {
+                minimum_integration_coherence: 0.7,
+                minimum_response_quality: 0.7,
+                success_threshold: 0.75,
+            },
+            atp_costs: DiadochiAtpCosts {
+                router_cost: 50,
+                chain_cost_per_expert: 150,
+                mixture_base_cost: 100,
+                mixture_cost_per_expert: 200,
+                system_prompt_cost: 75,
+                synthesis_cost: 100,
+            },
         }
     }
 }

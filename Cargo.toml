@@ -64,6 +64,7 @@ thiserror = "1.0"
 # Cryptography and security
 ring = "0.17"
 uuid = { version = "1.6", features = ["v4", "serde"] }
+md5 = "0.7"
 
 # Configuration management
 config = "0.13"

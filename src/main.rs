@@ -19,6 +19,7 @@ mod mzekezeke;
 mod diggiden;
 mod hatata;
 mod zengeza;
+mod diadochi;
 
 use config::HonjoMasamuneConfig;
 use engine::HonjoMasamuneEngine;
